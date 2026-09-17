@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ServiceHub — платформа услуг с картинками, описанием и облачным хранением">
+<title>ServiceHub — платформа услуг</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --primary: #667eea;
+        --primary-dark: #4a3f8f;
+        --secondary: #764ba2;
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #333;
+        --muted: #666;
+        --border: #e2e8f0;
+        --danger: #e53e3e;
+        --success: #38a169;
+        --radius: 12px;
+        --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); cursor: pointer; }
+    nav ul { list-style: none; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+    nav a, nav button.link {
+        text-decoration: none; color: var(--muted); font-weight: 500;
+        background: none; border: none; cursor: pointer; font-size: 1rem;
+        transition: color 0.2s; font-family: inherit;
+    }
+    nav a:hover, nav button.link:hover { color: var(--primary); }
+
+    .user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.95rem; }
+    .user-info .name { font-weight: 600; color: var(--primary-dark); }
+    .avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.9rem;
+    }
+
+    .sync-status {
+        font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+        background: #edf2f7; color: var(--muted);
+    }
+    .sync-status.online { background: #c6f6d5; color: #22543d; }
+    .sync-status.offline { background: #fed7d7; color: #742a2a; }
+    .sync-status.syncing { background: #feebc8; color: #7b341e; }
+
+    /* MAIN */
+    main { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem 1rem; }
+    .page { display: none; animation: fadeIn 0.4s ease; }
+    .page.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hero {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff; border-radius: var(--radius);
+        padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;
+    }
+    .hero h2 { font-size: 2.2rem; margin-bottom: 0.8rem; }
+    .hero p { font-size: 1.1rem; opacity: 0.95; max-width: 600px; margin: 0 auto; }
+
+    .section-title {
+        font-size: 1.6rem; color: var(--primary-dark); margin-bottom: 1.2rem;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 1rem;
+    }
+
+    /* BUTTONS */
+    .btn {
+        display: inline-block; padding: 0.7rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff; text-decoration: none; border-radius: 50px;
+        font-weight: 600; border: none; cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(102,126,234,0.35);
+        font-family: inherit; font-size: 0.95rem;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(102,126,234,0.5); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+    .btn-outline {
+        background: transparent; color: var(--primary);
+        border: 2px solid var(--primary); box-shadow: none;
+    }
+    .btn-outline:hover { background: var(--primary); color: #fff; }
+    .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(229,62,62,0.35); }
+    .btn-ghost { background: transparent; color: var(--muted); box-shadow: none; border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg); color: var(--primary-dark); }
+
+    /* CARDS */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .card {
+        background: var(--card); border-radius: var(--radius);
+        box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+
+    .card-image {
+        width: 100%; aspect-ratio: 16/10;
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+        background-size: cover; background-position: center;
+        display: flex; align-items: center; justify-content: center;
+        color: #a0aec0; font-size: 2.5rem;
+        position: relative;
+    }
+    .card-body { padding: 1.2rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
+    .card h3 { color: var(--primary-dark); font-size: 1.15rem; }
+    .card .price { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+    .card .desc {
+        color: var(--muted); font-size: 0.95rem; flex: 1;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .card .meta { font-size: 0.8rem; color: #999; }
+    .card-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+
+    .empty {
+        text-align: center; padding: 3rem 1rem; color: var(--muted);
+        background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+
+    /* FORM */
+    .form-container {
+        max-width: 460px; margin: 2rem auto; background: var(--card);
+        padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .form-container h2 { color: var(--primary-dark); margin-bottom: 1.5rem; text-align: center; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+        display: block; margin-bottom: 0.35rem; font-weight: 600;
+        font-size: 0.9rem; color: var(--text);
+    }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--border);
+        border-radius: 8px; font-size: 1rem; font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s; background: #fff;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+        outline: none; border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+
+    .form-footer { margin-top: 1.2rem; text-align: center; font-size: 0.9rem; color: var(--muted); }
+    .form-footer button.link {
+        background: none; border: none; color: var(--primary); cursor: pointer;
+        font-weight: 600; font-family: inherit; font-size: 0.9rem;
+    }
+    .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
+    .success { color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; }
+
+    /* IMAGE UPLOAD */
+    .image-upload {
+        border: 2px dashed var(--border); border-radius: 10px;
+        padding: 1.2rem; text-align: center; cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        background: #fafbfd;
+    }
+    .image-upload:hover { border-color: var(--primary); background: #f0f4ff; }
+    .image-upload.has-image { padding: 0; border-style: solid; overflow: hidden; }
+    .image-preview {
+        width: 100%; max-height: 220px; object-fit: cover; display: block;
+        border-radius: 8px;
+    }
+    .image-upload-hint { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+    .image-upload input[type=file] { display: none; }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+        display: none; align-items: center; justify-content: center;
+        z-index: 200; padding: 1rem; overflow-y: auto;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+        background: #fff; border-radius: var(--radius); padding: 2rem;
+        max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto;
+        animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .modal h3 { color: var(--primary-dark); margin-bottom: 1rem; }
+    .modal-actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+    /* SETTINGS */
+    .settings-block {
+        background: var(--card); border-radius: var(--radius);
+        padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow);
+    }
+    .settings-block h3 { color: var(--primary-dark); margin-bottom: 0.8rem; }
+    .settings-block p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .settings-block code {
+        background: #edf2f7; padding: 0.15rem 0.4rem;
+        border-radius: 4px; font-size: 0.85rem;
+    }
+
+    /* TOAST */
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--success); color: #fff;
+        padding: 0.9rem 1.5rem; border-radius: 8px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        opacity: 0; transform: translateY(20px);
+        transition: all 0.3s; z-index: 300; pointer-events: none;
+        max-width: 340px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: var(--danger); }
+
+    footer {
+        background: #1a1a2e; color: #ccc; text-align: center;
+        padding: 1.5rem; font-size: 0.9rem; margin-top: 2rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        header { padding: 1rem; }
+        .logo { font-size: 1.2rem; }
+        nav ul { gap: 1rem; width: 100%; justify-content: center; }
+        .hero { padding: 2rem 1.2rem; }
+        .hero h2 { font-size: 1.6rem; }
+        .hero p { font-size: 1rem; }
+        main { padding: 1.5rem 0.8rem; }
+        .section-title { font-size: 1.3rem; }
+        .form-container { padding: 1.5rem; margin: 1rem auto; }
+        .modal { padding: 1.5rem; }
+        .toast { left: 1rem; right: 1rem; bottom: 1rem; text-align: center; max-width: none; }
+        .user-info .name { display: none; }
+    }
+    @media (max-width: 480px) {
+        .grid { grid-template-columns: 1fr; }
+        .hero h2 { font-size: 1.4rem; }
+        .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+    }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo" onclick="showPage('home')">🚀 ServiceHub</div>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showPage('home'); return false;">Главная</a></li>
+            <li><a href="#" onclick="showPage('catalog'); return false;">Услуги</a></li>
+            <li id="navDashboard" style="display:none;">
+                <a href="#" onclick="showPage('dashboard'); return false;">Личный кабинет</a>
+            </li>
+            <li><a href="#" onclick="showPage('settings'); return false;">⚙ Синхронизация</a></li>
+        </ul>
+    </nav>
+    <div class="user-info" id="userInfo"></div>
+</header>
+
+<main>
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+        <div class="hero">
+            <h2>Найдите нужную услугу</h2>
+            <p>Платформа, где каждый может предложить свои услуги с фото, описанием и ценой. Регистрируйтесь и добавляйте услуги бесплатно.</p>
+            <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <button class="btn" onclick="showPage('catalog')">Смотреть услуги</button>
+                <button class="btn btn-outline" style="color:#fff;border-color:#fff;" onclick="openAuth('register')">Стать исполнителем</button>
+            </div>
+        </div>
+        <h2 class="section-title">Популярные услуги</h2>
+        <div class="grid" id="homeServices"></div>
+    </section>
+
+    <!-- CATALOG -->
+    <section id="page-catalog" class="page">
+        <div class="section-title">
+            <h2>Все услуги</h2>
+            <input type="text" id="searchInput" placeholder="🔍 Поиск услуги..."
+                   style="padding:0.6rem 1rem; border:1px solid var(--border); border-radius:50px; font-size:0.95rem; min-width:220px;"
+                   oninput="renderCatalog()">
+        </div>
+        <div class="grid" id="catalogServices"></div>
+        <div id="catalogEmpty" class="empty" style="display:none;">
+            Услуг пока нет. Станьте первым исполнителем!
+        </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page">
+        <div class="section-title">
+            <h2>Мои услуги</h2>
+            <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
+        </div>
+        <div class="grid" id="myServices"></div>
+        <div id="myServicesEmpty" class="empty" style="display:none;">
+            У вас пока нет услуг. Нажмите «Добавить услугу», чтобы создать первую.
+        </div>
+    </section>
+
+    <!-- AUTH -->
+    <section id="page-auth" class="page">
+        <div class="form-container">
+            <h2 id="authTitle">Вход</h2>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group" id="nameGroup" style="display:none;">
+                    <label for="authName">Имя</label>
+                    <input type="text" id="authName" placeholder="Ваше имя" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="authEmail">Email</label>
+                    <input type="email" id="authEmail" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Пароль</label>
+                    <input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="6" autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;" id="authSubmit">Войти</button>
+                <div class="error" id="authError"></div>
+            </form>
+            <div class="form-footer">
+                <span id="authSwitchText">Нет аккаунта?</span>
+                <button class="link" onclick="switchAuthMode()" id="authSwitchBtn">Зарегистрироваться</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SETTINGS / SYNC -->
+    <section id="page-settings" class="page">
+        <h2 class="section-title">⚙ Синхронизация с GitHub Gist</h2>
+
+        <div class="settings-block">
+            <h3>Что это?</h3>
+            <p>
+                Все данные (пользователи и услуги) могут храниться в вашем приватном
+                <strong>GitHub Gist</strong>. Это позволит заходить с любого устройства и видеть одни и те же услуги.
+            </p>
+            <p>
+                <strong>Важно:</strong> токен хранится только в вашем браузере (localStorage).
+                Не публикуйте его. Для продакшена используйте серверный бэкенд.
+            </p>
+        </div>
+
+        <div class="settings-block">
+            <h3>1. Создайте GitHub-токен</h3>
+            <p>
+                Зайдите в <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">
+                github.com/settings/tokens/new</a>, выберите scope <code>gist</code>, создайте и скопируйте токен.
+            </p>
+        </div>
+
+        <div class="settings-block">
+            <h3>2. Введите токен и Gist ID</h3>
+            <div class="form-group">
+                <label for="ghToken">GitHub токен (ghp_...)</label>
+                <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="ghGistId">Gist ID (оставьте пустым для создания нового)</label>
+                <input type="text" id="ghGistId" placeholder="например: a1b2c3d4e5f6..." autocomplete="off">
+            </div>
+            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                <button class="btn" onclick="saveGithubConfig()">💾 Сохранить настройки</button>
+                <button class="btn btn-outline" onclick="testGithubConnection()">🔌 Проверить связь</button>
+                <button class="btn btn-ghost" onclick="clearGithubConfig()">Очистить</button>
+            </div>
+            <div class="success" id="ghStatus" style="margin-top:0.8rem;"></div>
+        </div>
+
+        <div class="settings-block">
+            <h3>3. Ручное управление</h3>
+            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                <button class="btn" onclick="syncPush()">⬆ Загрузить в облако</button>
+                <button class="btn btn-outline" onclick="syncPull()">⬇ Загрузить из облака</button>
+                <button class="btn btn-ghost" onclick="exportJSON()">📥 Скачать JSON</button>
+                <label class="btn btn-ghost" style="cursor:pointer;">
+                    📤 Загрузить JSON
+                    <input type="file" accept=".json,application/json" style="display:none;" onchange="importJSON(event)">
+                </label>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- MODAL: SERVICE -->
+<div class="modal-overlay" id="serviceModal">
+    <div class="modal">
+        <h3 id="serviceModalTitle">Новая услуга</h3>
+        <form id="serviceForm" onsubmit="saveService(event)">
+            <input type="hidden" id="serviceId">
+            <input type="hidden" id="serviceImageData">
+
+            <div class="form-group">
+                <label>Изображение услуги</label>
+                <label class="image-upload" id="imageUploadBox" for="serviceImageInput">
+                    <div id="imagePlaceholder">
+                        <div style="font-size:2rem;">🖼</div>
+                        <div class="image-upload-hint">Нажмите, чтобы выбрать картинку (JPG/PNG, до ~1.5 МБ)</div>
+                    </div>
+                    <img id="imagePreview" class="image-preview" style="display:none;" alt="">
+                    <input type="file" id="serviceImageInput" accept="image/*" onchange="handleImageUpload(event)">
+                </label>
+                <div style="margin-top:0.5rem;">
+                    <button type="button" class="btn btn-sm btn-ghost" onclick="clearImage()">Убрать картинку</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceTitle">Название услуги *</label>
+                <input type="text" id="serviceTitle" required maxlength="80" placeholder="Например: Верстка сайтов">
+            </div>
+
+            <div class="form-group">
+                <label for="servicePrice">Цена, ₽ *</label>
+                <input type="number" id="servicePrice" required min="0" step="1" placeholder="5000">
+            </div>
+
+            <div class="form-group">
+                <label for="serviceCategory">Категория</label>
+                <select id="serviceCategory">
+                    <option value="Разработка">Разработка</option>
+                    <option value="Дизайн">Дизайн</option>
+                    <option value="Маркетинг">Маркетинг</option>
+                    <option value="Тексты">Тексты</option>
+                    <option value="Ремонт">Ремонт</option>
+                    <option value="Репетиторство">Репетиторство</option>
+                    <option value="Другое">Другое</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceDesc">Описание *</label>
+                <textarea id="serviceDesc" required maxlength="1000" placeholder="Опишите подробно, что вы предлагаете..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeServiceModal()">Отмена</button>
+                <button type="submit" class="btn">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 ServiceHub. Все права защищены.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   ХРАНИЛИЩЕ (localStorage + GitHub Gist)
+   ========================================================= */
+const DB = {
+    get users()     { return JSON.parse(localStorage.getItem('sh_users') || '[]'); },
+    set users(v)    { localStorage.setItem('sh_users', JSON.stringify(v)); },
+
+    get services()  { return JSON.parse(localStorage.getItem('sh_services') || '[]'); },
+    set services(v) { localStorage.setItem('sh_services', JSON.stringify(v)); },
+
+    get session()   { return JSON.parse(localStorage.getItem('sh_session') || 'null'); },
+    set session(v)  { v ? localStorage.setItem('sh_session', JSON.stringify(v)) : localStorage.removeItem('sh_session'); },
+
+    get gh()        { return JSON.parse(localStorage.getItem('sh_gh') || 'null'); },
+    set gh(v)       { v ? localStorage.setItem('sh_gh', JSON.stringify(v)) : localStorage.removeItem('sh_gh'); }
+};
+
+function hashPassword(pwd) {
+    let hash = 0;
+    for (let i = 0; i < pwd.length; i++) {
+        hash = ((hash << 5) - hash) + pwd.charCodeAt(i);
+        hash |= 0;
+    }
+    return 'h' + Math.abs(hash).toString(36);
+}
+
+/* =========================================================
+   УТИЛИТЫ
+   ========================================================= */
+function toast(msg, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.className = 'toast' + (isError ? ' error' : ''), 2800);
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[s]));
+}
+
+function formatPrice(n) {
+    return Number(n || 0).toLocaleString('ru-RU') + ' ₽';
+}
+
+function currentUser() {
+    const s = DB.session;
+    if (!s) return null;
+    return DB.users.find(u => u.id === s.userId) || null;
+}
+
+/* =========================================================
+   GITHUB GIST СИНХРОНИЗАЦИЯ
+   ========================================================= */
+const GIST_FILENAME = 'servicehub-data.json';
+
+async function gistRequest(method, url, token, body) {
+    const res = await fetch(url, {
+        method,
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+        },
+        body: body ? JSON.stringify(body) : undefined
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`GitHub API ${res.status}: ${text.slice(0, 200)}`);
+    }
+    return res.json();
+}
+
+function collectAllData() {
+    return {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        users: DB.users,
+        services: DB.services
+    };
+}
+
+function applyAllData(data) {
+    if (!data || typeof data !== 'object') throw new Error('Некорректные данные');
+    if (Array.isArray(data.users))    DB.users    = data.users;
+    if (Array.isArray(data.services)) DB.services = data.services;
+    // сброс сессии, если текущего пользователя больше нет
+    const s = DB.session;
+    if (s && !DB.users.some(u => u.id === s.userId)) DB.session = null;
+}
+
+function setSyncStatus(text, cls = '') {
+    const el = document.getElementById('ghStatus');
+    if (el) el.textContent = text;
+}
+
+async function syncPush(silent = false) {
+    const cfg = DB.gh;
+    if (!cfg || !cfg.token) { if (!silent) toast('Сначала сохраните GitHub-токен', true); return; }
+
+    try {
+        setSyncStatus('Синхронизация...', 'syncing');
+        const payload = collectAllData();
+        const gistBody = {
+            description: 'ServiceHub data',
+            public: false,
+            files: {
+                [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) }
+            }
+        };
+
+        let gist;
+        if (cfg.gistId) {
+            gist = await gistRequest('PATCH', `https://api.github.com/gists/${cfg.gistId}`, cfg.token, gistBody);
+        } else {
+            gist = await gistRequest('POST', 'https://api.github.com/gists', cfg.token, gistBody);
+            DB.gh = { ...cfg, gistId: gist.id };
+            document.getElementById('ghGistId').value = gist.id;
+        }
+
+        setSyncStatus('✅ Синхронизировано: ' + new Date().toLocaleTimeString('ru-RU'));
+        if (!silent) toast('Данные загружены в облако');
+    } catch (e) {
+        setSyncStatus('❌ Ошибка: ' + e.message);
+        if (!silent) toast('Ошибка синхронизации: ' + e.message, true);
+    }
+}
+
+async function syncPull(silent = false) {
+    const cfg = DB.gh;
+    if (!cfg || !cfg.token || !cfg.gistId) {
+        if (!silent) toast('Укажите токен и Gist ID', true);
+        return;
+    }
+    try {
+        setSyncStatus('Загрузка...', 'syncing');
+        const gist = await gistRequest('GET', `https://api.github.com/gists/${cfg.gistId}`, cfg.token);
+        const file = gist.files[GIST_FILENAME];
+        if (!file) throw new Error('Файл данных не найден в Gist');
+        const content = file.truncated
+            ? await (await fetch(file.raw_url)).text()
+            : file.content;
+        const data = JSON.parse(content);
+        applyAllData(data);
+
+        setSyncStatus('✅ Загружено: ' + new Date().toLocaleTimeString('ru-RU'));
+        if (!silent) toast('Данные загружены из облака');
+        renderHeader();
+        renderHome();
+        renderCatalog();
+        renderDashboard();
+    } catch (e) {
+        setSyncStatus('❌ Ошибка: ' + e.message);
+        if (!silent) toast('Ошибка загрузки: ' + e.message, true);
+    }
+}
+
+function saveGithubConfig() {
+    const token = document.getElementById('ghToken').value.trim();
+    const gistId = document.getElementById('ghGistId').value.trim();
+    if (!token) { toast('Введите токен', true); return; }
+    DB.gh = { token, gistId: gistId || '' };
+    toast('Настройки синхронизации сохранены');
+    setSyncStatus('Настройки сохранены. Нажмите «Проверить связь».');
+}
+
+function clearGithubConfig() {
+    if (!confirm('Удалить сохранённые токен и Gist ID?')) return;
+    DB.gh = null;
+    document.getElementById('ghToken').value = '';
+    document.getElementById('ghGistId').value = '';
+    setSyncStatus('Настройки удалены.');
+    toast('Настройки удалены');
+}
+
+async function testGithubConnection() {
+    const token = document.getElementById('ghToken').value.trim();
+    if (!token) { toast('Сначала введите токен', true); return; }
+    try {
+        setSyncStatus('Проверка...', 'syncing');
+        const user = await gistRequest('GET', 'https://api.github.com/user', token);
+        setSyncStatus(`✅ Подключено как ${user.login}`);
+        toast('Связь с GitHub установлена');
+    } catch (e) {
+        setSyncStatus('❌ ' + e.message);
+        toast('Ошибка подключения', true);
+    }
+}
+
+/* =========================================================
+   ЭКСПОРТ / ИМПОРТ JSON
+   ========================================================= */
+function exportJSON() {
+    const data = collectAllData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'servicehub-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Файл скачан');
+}
+
+function importJSON(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            applyAllData(data);
+            toast('Данные импортированы');
+            renderHeader();
+            renderHome();
+            renderCatalog();
+            renderDashboard();
+        } catch (err) {
+            toast('Ошибка чтения файла: ' + err.message, true);
+        }
+    };
+    reader.readAsText(file);
+    ev.target.value = '';
+}
+
+/* =========================================================
+   НАВИГАЦИЯ
+   ========================================================= */
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+
+    if (name === 'home')      renderHome();
+    if (name === 'catalog')   renderCatalog();
+    if (name === 'dashboard') renderDashboard();
+    if (name === 'auth')      resetAuthForm();
+    if (name === 'settings')  loadGithubConfigToForm();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadGithubConfigToForm() {
+    const cfg = DB.gh;
+    if (cfg) {
+        document.getElementById('ghToken').value  = cfg.token || '';
+        document.getElementById('ghGistId').value = cfg.gistId || '';
+    }
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+function renderHeader() {
+    const user = currentUser();
+    const info = document.getElementById('userInfo');
+    const navDash = document.getElementById('navDashboard');
+
+    if (user) {
+        navDash.style.display = 'list-item';
+        const initials = user.name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+        info.innerHTML = `
+            <div class="avatar">${escapeHtml(initials)}</div>
+            <span class="name">${escapeHtml(user.name)}</span>
+            <button class="btn btn-sm btn-outline" onclick="logout()">Выйти</button>
+        `;
+    } else {
+        navDash.style.display = 'none';
+        info.innerHTML = `
+            <button class="btn btn-sm btn-outline" onclick="openAuth('login')">Войти</button>
+            <button class="btn btn-sm" onclick="openAuth('register')">Регистрация</button>
+        `;
+    }
+}
+
+/* =========================================================
+   АВТОРИЗАЦИЯ
+   ========================================================= */
+let authMode = 'login';
+
+function openAuth(mode) {
+    authMode = mode;
+    resetAuthForm();
+    showPage('auth');
+}
+
+function switchAuthMode() {
+    authMode = authMode === 'login' ? 'register' : 'login';
+    resetAuthForm();
+}
+
+function resetAuthForm() {
+    const isLogin = authMode === 'login';
+    document.getElementById('authTitle').textContent    = isLogin ? 'Вход' : 'Регистрация';
+    document.getElementById('authSubmit').textContent   = isLogin ? 'Войти' : 'Создать аккаунт';
+    document.getElementById('nameGroup').style.display  = isLogin ? 'none' : 'block';
+    document.getElementById('authSwitchText').textContent = isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
+    document.getElementById('authSwitchBtn').textContent  = isLogin ? 'Зарегистрироваться' : 'Войти';
+    document.getElementById('authError').textContent = '';
+    document.getElementById('authForm').reset();
+}
+
+function handleAuth(e) {
+    e.preventDefault();
+    const nameEl = document.getElementById('authName');
+    const email  = document.getElementById('authEmail').value.trim().toLowerCase();
+    const pwd    = document.getElementById('authPassword').value;
+    const errEl  = document.getElementById('authError');
+    errEl.textContent = '';
+
+    if (authMode === 'register') {
+        const name = nameEl.value.trim();
+        if (name.length < 2) { errEl.textContent = 'Введите имя (мин. 2 символа)'; return; }
+        if (DB.users.some(u => u.email === email)) {
+            errEl.textContent = 'Пользователь с таким email уже существует';
+            return;
+        }
+        const user = {
+            id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+            name, email,
+            password: hashPassword(pwd),
+            createdAt: new Date().toISOString()
+        };
+        const users = DB.users; users.push(user); DB.users = users;
+        DB.session = { userId: user.id };
+        toast('Аккаунт создан! Добро пожаловать, ' + name);
+        renderHeader();
+        showPage('dashboard');
+    } else {
+        const user = DB.users.find(u => u.email === email);
+        if (!user || user.password !== hashPassword(pwd)) {
+            errEl.textContent = 'Неверный email или пароль';
+            return;
+        }
+        DB.session = { userId: user.id };
+        toast('С возвращением, ' + user.name + '!');
+        renderHeader();
+        showPage('dashboard');
+    }
+
+    // автосинк после авторизации
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function logout() {
+    DB.session = null;
+    renderHeader();
+    toast('Вы вышли из аккаунта');
+    showPage('home');
+}
+
+/* =========================================================
+   КАРТИНКИ
+   ========================================================= */
+const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024; // 1.5 МБ
+
+function handleImageUpload(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Это не изображение', true); return; }
+    if (file.size > MAX_IMAGE_BYTES) {
+        toast('Файл слишком большой (макс. 1.5 МБ)', true);
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+        // сжимаем через canvas, чтобы поместиться в gist/localStorage
+        compressImage(e.target.result, 900, 0.82).then(dataUrl => {
+            document.getElementById('serviceImageData').value = dataUrl;
+            const preview = document.getElementById('imagePreview');
+            preview.src = dataUrl;
+            preview.style.display = 'block';
+            document.getElementById('imagePlaceholder').style.display = 'none';
+            document.getElementById('imageUploadBox').classList.add('has-image');
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+function compressImage(dataUrl, maxW, quality) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(1, maxW / img.width);
+            const w = Math.round(img.width * scale);
+            const h = Math.round(img.height * scale);
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+    });
+}
+
+function clearImage() {
+    document.getElementById('serviceImageData').value = '';
+    document.getElementById('serviceImageInput').value = '';
+    const preview = document.getElementById('imagePreview');
+    preview.src = '';
+    preview.style.display = 'none';
+    document.getElementById('imagePlaceholder').style.display = 'block';
+    document.getElementById('imageUploadBox').classList.remove('has-image');
+}
+
+/* =========================================================
+   РЕНДЕР УСЛУГ
+   ========================================================= */
+function serviceCard(s, opts = {}) {
+    const owner = DB.users.find(u => u.id === s.userId);
+    const ownerName = owner ? owner.name : 'Неизвестный';
+    const date = new Date(s.createdAt).toLocaleDateString('ru-RU');
+
+    const imageHtml = s.image
+        ? `<div class="card-image" style="background-image:url('${s.image}');"></div>`
+        : `<div class="card-image">🖼</div>`;
+
+    const actions = opts.mine
+        ? `<div class="card-actions">
+             <button class="btn btn-sm btn-outline" onclick="openServiceModal('${s.id}')">✏️ Изменить</button>
+             <button class="btn btn-sm btn-danger" onclick="deleteService('${s.id}')">🗑 Удалить</button>
+           </div>`
+        : '';
+
+    return `
+        <div class="card">
+            ${imageHtml}
+            <div class="card-body">
+                <div class="meta">${escapeHtml(s.category)} • ${date}</div>
+                <h3>${escapeHtml(s.title)}</h3>
+                <div class="price">${formatPrice(s.price)}</div>
+                <div class="desc">${escapeHtml(s.description)}</div>
+                <div class="meta">👤 ${escapeHtml(ownerName)}</div>
+                ${actions}
+            </div>
+        </div>`;
+}
+
+function renderHome() {
+    const all = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
+    const box = document.getElementById('homeServices');
+    box.innerHTML = all.length
+        ? all.map(s => serviceCard(s)).join('')
+        : `<div class="empty" style="grid-column:1/-1;">Пока нет услуг. Зарегистрируйтесь и добавьте первую!</div>`;
+}
+
+function renderCatalog() {
+    const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    let list = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (q) {
+        list = list.filter(s =>
+            s.title.toLowerCase().includes(q) ||
+            s.description.toLowerCase().includes(q) ||
+            s.category.toLowerCase().includes(q)
+        );
+    }
+    const box = document.getElementById('catalogServices');
+    const empty = document.getElementById('catalogEmpty');
+    if (!list.length) {
+        box.innerHTML = '';
+        empty.style.display = 'block';
+        empty.textContent = q ? 'Ничего не найдено по запросу «' + q + '»' : 'Услуг пока нет.';
+    } else {
+        empty.style.display = 'none';
+        box.innerHTML = list.map(s => serviceCard(s)).join('');
+    }
+}
+
+function renderDashboard() {
+    const user = currentUser();
+    if (!user) { showPage('auth'); return; }
+    const mine = DB.services
+        .filter(s => s.userId === user.id)
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const box = document.getElementById('myServices');
+    const empty = document.getElementById('myServicesEmpty');
+    if (!mine.length) {
+        box.innerHTML = '';
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        box.innerHTML = mine.map(s => serviceCard(s, { mine: true })).join('');
+    }
+}
+
+/* =========================================================
+   CRUD УСЛУГ
+   ========================================================= */
+function openServiceModal(id = null) {
+    const user = currentUser();
+    if (!user) { openAuth('login'); return; }
+
+    const modal = document.getElementById('serviceModal');
+    const title = document.getElementById('serviceModalTitle');
+    const form  = document.getElementById('serviceForm');
+    form.reset();
+    document.getElementById('serviceId').value = '';
+    clearImage();
+
+    if (id) {
+        const s = DB.services.find(x => x.id === id);
+        if (!s) return;
+        if (s.userId !== user.id) { toast('Это не ваша услуга', true); return; }
+        title.textContent = 'Редактировать услугу';
+        document.getElementById('serviceId').value    = s.id;
+        document.getElementById('serviceTitle').value = s.title;
+        document.getElementById('servicePrice').value = s.price;
+        document.getElementById('serviceCategory').value = s.category;
+        document.getElementById('serviceDesc').value  = s.description;
+        if (s.image) {
+            document.getElementById('serviceImageData').value = s.image;
+            const preview = document.getElementById('imagePreview');
+            preview.src = s.image;
+            preview.style.display = 'block';
+            document.getElementById('imagePlaceholder').style.display = 'none';
+            document.getElementById('imageUploadBox').classList.add('has-image');
+        }
+    } else {
+        title.textContent = 'Новая услуга';
+    }
+
+    modal.classList.add('active');
+}
+
+function closeServiceModal() {
+    document.getElementById('serviceModal').classList.remove('active');
+}
+
+function saveService(e) {
+    e.preventDefault();
+    const user = currentUser();
+    if (!user) return;
+
+    const id       = document.getElementById('serviceId').value;
+    const title    = document.getElementById('serviceTitle').value.trim();
+    const price    = Number(document.getElementById('servicePrice').value);
+    const category = document.getElementById('serviceCategory').value;
+    const description = document.getElementById('serviceDesc').value.trim();
+    const image    = document.getElementById('serviceImageData').value || '';
+
+    if (!title || !description || isNaN(price) || price < 0) {
+        toast('Заполните все поля корректно', true);
+        return;
+    }
+
+    let list = DB.services;
+    if (id) {
+        const idx = list.findIndex(s => s.id === id && s.userId === user.id);
+        if (idx === -1) { toast('Услуга не найдена', true); return; }
+        list[idx] = { ...list[idx], title, price, category, description, image, updatedAt: new Date().toISOString() };
+        toast('Услуга обновлена');
+    } else {
+        list.push({
+            id: 's_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+            userId: user.id,
+            title, price, category, description, image,
+            createdAt: new Date().toISOString()
+        });
+        toast('Услуга добавлена');
+    }
+    DB.services = list;
+    closeServiceModal();
+    renderDashboard();
+    renderHome();
+    renderCatalog();
+
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function deleteService(id) {
+    const user = currentUser();
+    if (!user) return;
+    if (!confirm('Удалить эту услугу?')) return;
+
+    DB.services = DB.services.filter(s => !(s.id === id && s.userId === user.id));
+    toast('Услуга удалена');
+    renderDashboard();
+    renderHome();
+    renderCatalog();
+
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+/* =========================================================
+   МОДАЛКА: закрытие по клику вне и Esc
+   ========================================================= */
+document.getElementById('serviceModal').addEventListener('click', e => {
+    if (e.target.id === 'serviceModal') closeServiceModal();
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeServiceModal();
+});
+
+/* =========================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ========================================================= */
+(function init() {
+    // демо-данные
+    if (!localStorage.getItem('sh_seeded')) {
+        const demoUser = {
+            id: 'u_demo',
+            name: 'Демо Пользователь',
+            email: 'demo@example.com',
+            password: hashPassword('demo123'),
+            createdAt: new Date().toISOString()
+        };
+        if (!DB.users.some(u => u.email === demoUser.email)) {
+            const users = DB.users; users.push(demoUser); DB.users = users;
+        }
+        const services = DB.services;
+        if (!services.length) {
+            services.push(
+                { id:'s_demo1', userId:'u_demo', title:'Верстка адаптивных сайтов',
+                  price:15000, category:'Разработка',
+                  description:'Сделаю адаптивную верстку по макету Figma. Кроссбраузерно, с анимациями.',
+                  image:'', createdAt:new Date(Date.now()-86400000*3).toISOString() },
+                { id:'s_demo2', userId:'u_demo', title:'Дизайн логотипа',
+                  price:5000, category:'Дизайн',
+                  description:'Разработаю уникальный логотип с исходниками в векторе.',
+                  image:'', createdAt:new Date(Date.now()-86400000*2).toISOString() },
+                { id:'s_demo3', userId:'u_demo', title:'Написание текстов для сайта',
+                  price:3000, category:'Тексты',
+                  description:'Продающие тексты, SEO-оптимизация, редактура.',
+                  image:'', createdAt:new Date(Date.now()-86400000).toISOString() }
+            );
+            DB.services = services;
+        }
+        localStorage.setItem('sh_seeded', '1');
+    }
+
+    renderHeader();
+    renderHome();
+
+    // если есть настройки GH — подтягиваем из облака при загрузке
+    if (DB.gh && DB.gh.token && DB.gh.gistId) {
+        syncPull(true);
+    }
+})();
+</script>
+</body>
+</html>
