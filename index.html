@@ -437,7 +437,7 @@
     .stat-card.purple { border-left-color: var(--secondary); }
     .stat-card.blue   { border-left-color: var(--info); }
 
-    /* LIST ITEMS (заявки, отзывы, уведомления) */
+    /* LIST ITEMS */
     .list-item {
         display: flex;
         gap: 1rem;
@@ -563,7 +563,7 @@
     .switch input:checked + .slider { background: var(--primary); }
     .switch input:checked + .slider::before { transform: translateX(20px); }
 
-    /* Chart bars (простая визуализация) */
+    /* Chart */
     .chart {
         display: flex;
         align-items: flex-end;
@@ -591,7 +591,6 @@
         white-space: nowrap;
     }
 
-    /* Скелетон для сессий/соцсетей */
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -612,12 +611,6 @@
         font-size: 1rem;
         color: var(--text);
         font-weight: 600;
-    }
-
-    /* Sync status / Toast */
-    .sync-status {
-        font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
-        background: #edf2f7; color: var(--muted);
     }
 
     .toast {
@@ -676,6 +669,179 @@
     .public-profile-card a:hover { text-decoration: underline; }
 
     /* =====================================================
+       SETTINGS PAGE (расширенные настройки)
+       ===================================================== */
+    .settings-search {
+        width: 100%; padding: 0.8rem 1.2rem 0.8rem 2.6rem;
+        border: 1px solid var(--border); border-radius: 50px;
+        font-size: 0.95rem; font-family: inherit;
+        background: var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat 1rem center;
+        color: var(--text);
+        margin-bottom: 1.2rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .settings-search:focus {
+        outline: none; border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+
+    .settings-section {
+        background: var(--bg);
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: border-color 0.2s;
+    }
+    .settings-section.hidden { display: none; }
+
+    .settings-section-head {
+        display: flex; align-items: center; gap: 0.8rem;
+        padding: 0.9rem 1.2rem;
+        cursor: pointer;
+        user-select: none;
+        background: var(--card);
+        transition: background 0.2s;
+    }
+    .settings-section-head:hover { background: var(--bg); }
+    .settings-section-head .ss-icon {
+        font-size: 1.2rem;
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+    .settings-section-head .ss-title {
+        flex: 1; font-weight: 600; color: var(--primary-dark);
+        font-size: 1rem;
+    }
+    .settings-section-head .ss-chevron {
+        color: var(--muted); font-size: 0.9rem;
+        transition: transform 0.25s;
+    }
+    .settings-section.open .settings-section-head .ss-chevron {
+        transform: rotate(180deg);
+    }
+    .settings-section-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        padding: 0 1.2rem;
+    }
+    .settings-section.open .settings-section-body {
+        max-height: 2000px;
+        padding: 0.6rem 1.2rem 1rem;
+    }
+
+    .settings-row {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row.hidden { display: none; }
+    .settings-row .sr-info { flex: 1; min-width: 0; }
+    .settings-row .sr-info h4 {
+        font-size: 0.93rem; color: var(--text); margin-bottom: 0.15rem;
+        font-weight: 600;
+    }
+    .settings-row .sr-info p {
+        font-size: 0.8rem; color: var(--muted);
+        line-height: 1.4;
+    }
+
+    .theme-picker {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+        margin-top: 0.4rem;
+    }
+    .theme-option {
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 0.7rem 0.5rem;
+        cursor: pointer;
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--muted);
+        transition: border-color 0.2s, transform 0.15s;
+        background: var(--card);
+    }
+    .theme-option:hover { transform: translateY(-2px); }
+    .theme-option.active {
+        border-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+    }
+    .theme-option .preview {
+        width: 100%; height: 36px;
+        border-radius: 6px;
+        margin-bottom: 0.4rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+    .theme-option[data-theme="light"] .preview { background: #f5f7fb; border: 1px solid #e2e8f0; }
+    .theme-option[data-theme="dark"]  .preview { background: #1a1a2e; border: 1px solid #3a3a5c; }
+    .theme-option[data-theme="auto"]  .preview { background: linear-gradient(90deg, #f5f7fb 50%, #1a1a2e 50%); border: 1px solid #e2e8f0; }
+
+    .font-size-picker {
+        display: flex; gap: 0.4rem;
+    }
+    .font-size-picker button {
+        padding: 0.35rem 0.8rem;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+    .font-size-picker button:hover { border-color: var(--primary); color: var(--primary); }
+    .font-size-picker button.active {
+        background: var(--primary); color: #fff; border-color: var(--primary);
+    }
+
+    .danger-zone {
+        border: 1px solid var(--danger) !important;
+        background: rgba(229,62,62,0.05) !important;
+    }
+
+    .settings-actions {
+        display: flex; gap: 0.6rem; flex-wrap: wrap;
+        padding: 1rem 0 0;
+        border-top: 1px solid var(--border);
+        margin-top: 1rem;
+    }
+
+    html[data-compact="true"] .dash-content { padding: 1.2rem; }
+    html[data-compact="true"] .card-body { padding: 0.9rem 1.1rem 1.1rem; }
+    html[data-compact="true"] .list-item { padding: 0.7rem; margin-bottom: 0.5rem; }
+    html[data-compact="true"] .dash-menu button { padding: 0.5rem 1rem; }
+    html[data-compact="true"] .settings-row { padding: 0.6rem 0; }
+    html[data-compact="true"] main { padding: 1.2rem 0.8rem; }
+
+    html[data-fontsize="small"]  body { font-size: 14px; }
+    html[data-fontsize="large"]  body { font-size: 17px; }
+
+    .storage-bar {
+        height: 8px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    .storage-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s;
+    }
+    .storage-bar-fill.warn { background: linear-gradient(90deg, var(--warning), var(--danger)); }
+
+    /* =====================================================
        ГЛОБАЛЬНЫЙ АДАПТИВ
        ===================================================== */
     @media (max-width: 900px) {
@@ -722,6 +888,7 @@
         .dash-header h2 { font-size: 1.2rem; }
         .form-row { grid-template-columns: 1fr; }
         .list-item { flex-wrap: wrap; }
+        .theme-picker { grid-template-columns: 1fr; }
     }
     @media (max-width: 480px) {
         .grid { grid-template-columns: 1fr; }
@@ -923,7 +1090,7 @@
                     <div class="grid" id="favoritesList"></div>
                 </div>
 
-                <!-- ============ ЗАЯВКИ (входящие) ============ -->
+                <!-- ============ ЗАЯВКИ ============ -->
                 <div class="dash-tab" data-tab="orders">
                     <div class="dash-header">
                         <div>
@@ -1113,105 +1280,359 @@
                     </div>
                 </div>
 
-                <!-- ============ НАСТРОЙКИ ============ -->
+                <!-- ============ НАСТРОЙКИ (расширенные) ============ -->
                 <div class="dash-tab" data-tab="settings">
                     <div class="dash-header">
                         <div>
                             <h2>Настройки</h2>
-                            <p>Внешний вид, уведомления и приватность</p>
+                            <p>Внешний вид, уведомления, приватность и данные</p>
+                        </div>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <button class="btn btn-ghost btn-sm" onclick="expandAllSettings(true)">Развернуть</button>
+                            <button class="btn btn-ghost btn-sm" onclick="expandAllSettings(false)">Свернуть</button>
                         </div>
                     </div>
 
-                    <h3 style="color:var(--primary-dark); margin-bottom:0.5rem; font-size:1.05rem;">Внешний вид</h3>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Тёмная тема</h4>
-                            <p>Комфортный просмотр ночью</p>
+                    <input type="text" id="settingsSearch" class="settings-search"
+                           placeholder="Поиск по настройкам..." oninput="filterSettings()">
+
+                    <!-- ВНЕШНИЙ ВИД -->
+                    <div class="settings-section open" data-section="appearance">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon">🎨</div>
+                            <div class="ss-title">Внешний вид</div>
+                            <div class="ss-chevron">▼</div>
                         </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optDarkTheme" onchange="toggleDarkTheme(this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Компактный режим</h4>
-                            <p>Меньше отступов, больше контента</p>
+                        <div class="settings-section-body">
+                            <div class="settings-row" data-keywords="тема dark theme темная светлая auto система">
+                                <div class="sr-info">
+                                    <h4>Тема оформления</h4>
+                                    <p>Светлая, тёмная или автоматически по системе</p>
+                                </div>
+                            </div>
+                            <div class="settings-row" style="padding-top:0;">
+                                <div style="width:100%;">
+                                    <div class="theme-picker" id="themePicker">
+                                        <div class="theme-option" data-theme="light" onclick="setThemeMode('light')">
+                                            <div class="preview">☀️</div>
+                                            Светлая
+                                        </div>
+                                        <div class="theme-option" data-theme="dark" onclick="setThemeMode('dark')">
+                                            <div class="preview">🌙</div>
+                                            Тёмная
+                                        </div>
+                                        <div class="theme-option" data-theme="auto" onclick="setThemeMode('auto')">
+                                            <div class="preview">🌗</div>
+                                            Авто
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-row" data-keywords="компактный compact режим отступы плотный">
+                                <div class="sr-info">
+                                    <h4>Компактный режим</h4>
+                                    <p>Меньше отступов, больше контента на экране</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optCompact" onchange="saveSetting('compact', this.checked); applyCompactMode(this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="settings-row" data-keywords="шрифт размер font size крупный мелкий">
+                                <div class="sr-info">
+                                    <h4>Размер шрифта</h4>
+                                    <p>Влияет на весь интерфейс</p>
+                                </div>
+                                <div class="font-size-picker" id="fontSizePicker">
+                                    <button data-size="small"  onclick="setFontSize('small')">A−</button>
+                                    <button data-size="normal" onclick="setFontSize('normal')">A</button>
+                                    <button data-size="large"  onclick="setFontSize('large')">A+</button>
+                                </div>
+                            </div>
                         </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optCompact" onchange="saveSetting('compact', this.checked)">
-                            <span class="slider"></span>
-                        </label>
                     </div>
 
-                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Уведомления</h3>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Email-уведомления</h4>
-                            <p>Получать письма о новых заявках</p>
+                    <!-- УВЕДОМЛЕНИЯ -->
+                    <div class="settings-section" data-section="notifications">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon">🔔</div>
+                            <div class="ss-title">Уведомления</div>
+                            <div class="ss-chevron">▼</div>
                         </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optEmailNotif" onchange="saveSetting('emailNotif', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Push-уведомления</h4>
-                            <p>Уведомления в браузере</p>
+                        <div class="settings-section-body">
+                            <div class="settings-row" data-keywords="email почта письма уведомления">
+                                <div class="sr-info">
+                                    <h4>Email-уведомления</h4>
+                                    <p>Получать письма о новых заявках и сообщениях</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optEmailNotif" onchange="saveSetting('emailNotif', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="push браузер уведомления всплывающие">
+                                <div class="sr-info">
+                                    <h4>Push-уведомления</h4>
+                                    <p>Всплывающие уведомления в браузере</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optPushNotif" onchange="saveSetting('pushNotif', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="отзывы рейтинг звезды review">
+                                <div class="sr-info">
+                                    <h4>Уведомления об отзывах</h4>
+                                    <p>Сообщать о новых отзывах на ваши услуги</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optReviewNotif" onchange="saveSetting('reviewNotif', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="сообщения чат messages диалог">
+                                <div class="sr-info">
+                                    <h4>Уведомления о сообщениях</h4>
+                                    <p>Сообщать о новых сообщениях в чате</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optMessageNotif" onchange="saveSetting('messageNotif', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="заявки orders новые">
+                                <div class="sr-info">
+                                    <h4>Уведомления о заявках</h4>
+                                    <p>Сообщать о новых заявках на услуги</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optOrderNotif" onchange="saveSetting('orderNotif', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
                         </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optPushNotif" onchange="saveSetting('pushNotif', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Уведомления об отзывах</h4>
-                            <p>Сообщать о новых отзывах</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optReviewNotif" onchange="saveSetting('reviewNotif', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Приватность</h3>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Показывать email</h4>
-                            <p>Другие увидят ваш email в профиле</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optShowEmail" onchange="saveSetting('showEmail', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Показывать телефон</h4>
-                            <p>Другие увидят ваш телефон</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optShowPhone" onchange="saveSetting('showPhone', this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="info">
-                            <h4>Принимать заявки</h4>
-                            <p>Разрешить отправлять вам заявки на услуги</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="optAcceptOrders" onchange="saveSetting('acceptOrders', this.checked)">
-                            <span class="slider"></span>
-                        </label>
                     </div>
 
-                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Данные</h3>
-                    <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                        <button class="btn btn-outline btn-sm" onclick="exportMyData()">📥 Экспорт моих данных</button>
-                        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙ GitHub синхронизация</button>
+                    <!-- ПРИВАТНОСТЬ -->
+                    <div class="settings-section" data-section="privacy">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon">🔒</div>
+                            <div class="ss-title">Приватность</div>
+                            <div class="ss-chevron">▼</div>
+                        </div>
+                        <div class="settings-section-body">
+                            <div class="settings-row" data-keywords="email почта показывать профиль">
+                                <div class="sr-info">
+                                    <h4>Показывать email</h4>
+                                    <p>Другие пользователи увидят ваш email в профиле</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optShowEmail" onchange="saveSetting('showEmail', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="телефон phone показывать контакт">
+                                <div class="sr-info">
+                                    <h4>Показывать телефон</h4>
+                                    <p>Другие пользователи увидят ваш телефон</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optShowPhone" onchange="saveSetting('showPhone', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="город city показывать геолокация">
+                                <div class="sr-info">
+                                    <h4>Показывать город</h4>
+                                    <p>Другие увидят ваш город в профиле</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optShowCity" onchange="saveSetting('showCity', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="заявки orders принимать исполнитель">
+                                <div class="sr-info">
+                                    <h4>Принимать заявки</h4>
+                                    <p>Разрешить другим отправлять вам заявки на услуги</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optAcceptOrders" onchange="saveSetting('acceptOrders', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="сообщения messages принимать чат">
+                                <div class="sr-info">
+                                    <h4>Принимать сообщения</h4>
+                                    <p>Разрешить другим писать вам в чат</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optAcceptMessages" onchange="saveSetting('acceptMessages', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-row" data-keywords="онлайн статус показывать активность">
+                                <div class="sr-info">
+                                    <h4>Показывать статус «онлайн»</h4>
+                                    <p>Другие увидят, когда вы в сети</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="optShowOnline" onchange="saveSetting('showOnline', this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ЯЗЫК И РЕГИОН -->
+                    <div class="settings-section" data-section="locale">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon">🌐</div>
+                            <div class="ss-title">Язык и регион</div>
+                            <div class="ss-chevron">▼</div>
+                        </div>
+                        <div class="settings-section-body">
+                            <div class="settings-row" data-keywords="язык language русский english">
+                                <div class="sr-info">
+                                    <h4>Язык интерфейса</h4>
+                                    <p>Выберите предпочитаемый язык</p>
+                                </div>
+                                <select id="optLanguage" onchange="saveSetting('language', this.value)"
+                                        style="padding:0.5rem 0.9rem; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-family:inherit;">
+                                    <option value="ru">Русский</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                            <div class="settings-row" data-keywords="валюта currency рубль">
+                                <div class="sr-info">
+                                    <h4>Валюта</h4>
+                                    <p>В какой валюте показывать цены</p>
+                                </div>
+                                <select id="optCurrency" onchange="saveSetting('currency', this.value)"
+                                        style="padding:0.5rem 0.9rem; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-family:inherit;">
+                                    <option value="RUB">₽ Рубль</option>
+                                    <option value="USD">$ Доллар</option>
+                                    <option value="EUR">€ Евро</option>
+                                </select>
+                            </div>
+                            <div class="settings-row" data-keywords="часовой пояс timezone">
+                                <div class="sr-info">
+                                    <h4>Часовой пояс</h4>
+                                    <p>Влияет на отображение времени</p>
+                                </div>
+                                <select id="optTimezone" onchange="saveSetting('timezone', this.value)"
+                                        style="padding:0.5rem 0.9rem; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-family:inherit;">
+                                    <option value="auto">Автоматически</option>
+                                    <option value="Europe/Moscow">Москва (UTC+3)</option>
+                                    <option value="Europe/Kiev">Киев (UTC+2)</option>
+                                    <option value="Asia/Almaty">Алматы (UTC+6)</option>
+                                    <option value="Asia/Novosibirsk">Новосибирск (UTC+7)</option>
+                                    <option value="Asia/Vladivostok">Владивосток (UTC+10)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ДАННЫЕ -->
+                    <div class="settings-section" data-section="data">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon">💾</div>
+                            <div class="ss-title">Данные и хранилище</div>
+                            <div class="ss-chevron">▼</div>
+                        </div>
+                        <div class="settings-section-body">
+                            <div class="settings-row" style="display:block;" data-keywords="хранилище размер storage байты">
+                                <div class="sr-info">
+                                    <h4>Использование хранилища</h4>
+                                    <p id="storageInfo">—</p>
+                                </div>
+                                <div class="storage-bar" style="margin-top:0.6rem;">
+                                    <div class="storage-bar-fill" id="storageBarFill" style="width:0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="settings-row" data-keywords="экспорт export скачать json данные">
+                                <div class="sr-info">
+                                    <h4>Экспорт данных</h4>
+                                    <p>Скачать все ваши данные в JSON</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="exportMyData()">📥 Скачать</button>
+                            </div>
+
+                            <div class="settings-row" data-keywords="импорт import загрузить json">
+                                <div class="sr-info">
+                                    <h4>Импорт данных</h4>
+                                    <p>Загрузить данные из JSON-файла</p>
+                                </div>
+                                <label class="btn btn-sm btn-outline" style="cursor:pointer;">
+                                    📤 Загрузить
+                                    <input type="file" accept=".json,application/json" style="display:none;" onchange="importJSON(event)">
+                                </label>
+                            </div>
+
+                            <div class="settings-row" data-keywords="настройки export settings экспорт">
+                                <div class="sr-info">
+                                    <h4>Экспорт настроек</h4>
+                                    <p>Сохранить только параметры аккаунта</p>
+                                </div>
+                                <button class="btn btn-sm btn-ghost" onclick="exportSettings()">⚙ Скачать</button>
+                            </div>
+
+                            <div class="settings-row" data-keywords="сброс reset настройки дефолт">
+                                <div class="sr-info">
+                                    <h4>Сбросить настройки</h4>
+                                    <p>Вернуть все параметры к значениям по умолчанию</p>
+                                </div>
+                                <button class="btn btn-sm btn-ghost" onclick="resetSettings()">↺ Сбросить</button>
+                            </div>
+
+                            <div class="settings-row" data-keywords="github gist синхронизация облако">
+                                <div class="sr-info">
+                                    <h4>GitHub синхронизация</h4>
+                                    <p>Облачное хранилище через приватный Gist</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="showPage('settings')">⚙ Настроить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ОПАСНАЯ ЗОНА -->
+                    <div class="settings-section danger-zone" data-section="danger">
+                        <div class="settings-section-head" onclick="toggleSettingsSection(this)">
+                            <div class="ss-icon" style="background:var(--danger);">⚠️</div>
+                            <div class="ss-title" style="color:var(--danger);">Опасная зона</div>
+                            <div class="ss-chevron">▼</div>
+                        </div>
+                        <div class="settings-section-body">
+                            <div class="settings-row" data-keywords="очистить историю уведомления сообщения">
+                                <div class="sr-info">
+                                    <h4>Очистить уведомления</h4>
+                                    <p>Удалить все уведомления из списка</p>
+                                </div>
+                                <button class="btn btn-sm btn-ghost" onclick="clearAllNotifs()">Очистить</button>
+                            </div>
+                            <div class="settings-row" data-keywords="выход logout сессия">
+                                <div class="sr-info">
+                                    <h4>Выйти со всех устройств</h4>
+                                    <p>Завершить все активные сессии</p>
+                                </div>
+                                <button class="btn btn-sm btn-ghost" onclick="logoutAll()">Выйти</button>
+                            </div>
+                            <div class="settings-row" data-keywords="удалить аккаунт delete опасная зона">
+                                <div class="sr-info">
+                                    <h4>Удалить аккаунт</h4>
+                                    <p>Необратимое удаление всех данных</p>
+                                </div>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAccount()">🗑 Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="showDashTab('security')">🔒 Безопасность</button>
+                        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">☁️ Синхронизация</button>
                     </div>
                 </div>
 
@@ -1519,7 +1940,7 @@
 
 <script>
 /* =========================================================
-   УТИЛИТЫ (безопасность, форматирование, debounce)
+   УТИЛИТЫ
    ========================================================= */
 function escapeHtml(str) {
     return String(str ?? '').replace(/[&<>"']/g, s => ({
@@ -1527,8 +1948,6 @@ function escapeHtml(str) {
     }[s]));
 }
 
-/* Безопасная вставка URL в CSS background-image.
-   Пропускает только data:image/*, http(s):, blob: и относительные пути. */
 function safeCssUrl(url) {
     if (!url || typeof url !== 'string') return '';
     const trimmed = url.trim();
@@ -1558,7 +1977,6 @@ function debounce(fn, wait = 250) {
     };
 }
 
-/* SHA-256 для паролей */
 const PWD_SALT = 'servicehub::v1::';
 async function hashPassword(pwd) {
     const data = new TextEncoder().encode(PWD_SALT + pwd);
@@ -1566,7 +1984,6 @@ async function hashPassword(pwd) {
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-/* Легаси-хеш для миграции старых записей */
 function legacyHash(pwd) {
     let hash = 0;
     for (let i = 0; i < pwd.length; i++) {
@@ -1610,7 +2027,7 @@ function serviceRating(userId) {
 }
 
 /* =========================================================
-   ХРАНИЛИЩЕ (безопасное, с обработкой переполнения)
+   ХРАНИЛИЩЕ
    ========================================================= */
 const DB = {
     _get(k, def) { return safeParse(localStorage.getItem(k), def); },
@@ -1859,7 +2276,7 @@ function refreshAll() {
 }
 
 /* =========================================================
-   HEADER + УВЕДОМЛЕНИЯ
+   HEADER
    ========================================================= */
 function renderHeader() {
     const user = currentUser();
@@ -1936,24 +2353,20 @@ async function handleAuth(e) {
             surname: '', status: 'Участник',
             social: { instagram:'', facebook:'', telegram:'', linkedin:'', github:'', website:'' },
             favorites: [],
-            settings: {
-                darkTheme: false, compact: false,
-                emailNotif: true, pushNotif: false, reviewNotif: true,
-                showEmail: false, showPhone: false, acceptOrders: true
-            },
+            settings: { ...DEFAULT_SETTINGS },
             createdAt: new Date().toISOString()
         };
         const users = DB.users; users.push(user); DB.users = users;
         DB.session = { userId: user.id };
         pushNotif(user.id, '👋', 'Добро пожаловать!', 'Заполните профиль и добавьте первую услугу.');
         toast('Аккаунт создан!');
+        applyThemeFromSettings(user.settings);
         renderHeader();
         showPage('dashboard');
     } else {
         const user = DB.users.find(u => u.email === email);
         if (!user) { errEl.textContent = 'Неверный email или пароль'; return; }
 
-        // миграция со старого хеша
         if (user.password && user.password.startsWith('h') && user.password === legacyHash(pwd)) {
             const users = DB.users;
             const i = users.findIndex(u => u.id === user.id);
@@ -1968,6 +2381,7 @@ async function handleAuth(e) {
         }
         DB.session = { userId: user.id };
         toast('С возвращением, ' + user.name + '!');
+        applyThemeFromSettings(user.settings || DEFAULT_SETTINGS);
         renderHeader();
         showPage('dashboard');
     }
@@ -2036,6 +2450,16 @@ function markAllNotifsRead() {
     renderNotifs();
     renderHeader();
     toast('Все уведомления прочитаны');
+}
+function clearAllNotifs() {
+    const user = currentUser();
+    if (!user) return;
+    if (!confirm('Удалить все ваши уведомления?')) return;
+    DB.notifs = DB.notifs.filter(n => n.userId !== user.id);
+    renderHeader();
+    renderNotifs();
+    toast('Уведомления очищены');
+    if (DB.gh && DB.gh.token) syncPush(true);
 }
 
 /* =========================================================
@@ -2271,9 +2695,6 @@ function showUserProfile(userId) {
     showPage('user');
 }
 
-/* =========================================================
-   СЧЁТЧИК ПРОСМОТРОВ
-   ========================================================= */
 function incrementViews(serviceId) {
     const list = DB.services;
     const i = list.findIndex(s => s.id === serviceId);
@@ -2311,6 +2732,228 @@ function renderFavorites() {
         : `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🤍</div>Пусто. Отмечайте услуги сердечком.</div>`;
     const cnt = document.getElementById('cntFavs');
     if (cnt) cnt.textContent = list.length || '';
+}
+
+/* =========================================================
+   НАСТРОЙКИ
+   ========================================================= */
+const DEFAULT_SETTINGS = {
+    themeMode: 'auto',
+    darkTheme: false,
+    compact: false,
+    fontSize: 'normal',
+    emailNotif: true,
+    pushNotif: false,
+    reviewNotif: true,
+    messageNotif: true,
+    orderNotif: true,
+    showEmail: false,
+    showPhone: false,
+    showCity: true,
+    acceptOrders: true,
+    acceptMessages: true,
+    showOnline: true,
+    language: 'ru',
+    currency: 'RUB',
+    timezone: 'auto'
+};
+
+function applyThemeFromSettings(settings) {
+    const s = settings || {};
+    let mode = s.themeMode;
+    if (!mode) mode = s.darkTheme ? 'dark' : 'light';
+
+    let isDark;
+    if (mode === 'auto') {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        isDark = mode === 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+    document.querySelectorAll('.theme-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.theme === mode);
+    });
+}
+
+if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const user = currentUser();
+        const mode = user?.settings?.themeMode;
+        if (mode === 'auto') applyThemeFromSettings(user.settings);
+    });
+}
+
+function setThemeMode(mode) {
+    saveSetting('themeMode', mode);
+    const user = currentUser();
+    if (user) {
+        const isDark = mode === 'dark' ||
+            (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        saveSetting('darkTheme', isDark);
+    }
+    applyThemeFromSettings({ themeMode: mode });
+    toast('Тема: ' + ({light:'светлая', dark:'тёмная', auto:'авто'}[mode]));
+}
+
+function applyCompactMode(on) {
+    document.documentElement.setAttribute('data-compact', on ? 'true' : 'false');
+}
+
+function setFontSize(size) {
+    saveSetting('fontSize', size);
+    applyFontSize(size);
+}
+function applyFontSize(size) {
+    document.documentElement.setAttribute('data-fontsize', size || 'normal');
+    document.querySelectorAll('#fontSizePicker button').forEach(b => {
+        b.classList.toggle('active', b.dataset.size === (size || 'normal'));
+    });
+}
+
+function toggleSettingsSection(headEl) {
+    const section = headEl.closest('.settings-section');
+    if (!section) return;
+    section.classList.toggle('open');
+}
+function expandAllSettings(open) {
+    document.querySelectorAll('.settings-section').forEach(s => {
+        s.classList.toggle('open', !!open);
+    });
+}
+
+function filterSettings() {
+    const q = (document.getElementById('settingsSearch').value || '').trim().toLowerCase();
+    document.querySelectorAll('.settings-section').forEach(section => {
+        let sectionVisible = false;
+        section.querySelectorAll('.settings-row').forEach(row => {
+            const keywords = (row.dataset.keywords || '').toLowerCase();
+            const text = row.textContent.toLowerCase();
+            const match = !q || keywords.includes(q) || text.includes(q);
+            row.classList.toggle('hidden', !match);
+            if (match) sectionVisible = true;
+        });
+        if (q) {
+            section.classList.toggle('open', sectionVisible);
+        }
+        section.classList.toggle('hidden', q && !sectionVisible);
+    });
+}
+
+function exportSettings() {
+    const user = currentUser();
+    if (!user) return;
+    const data = {
+        type: 'servicehub-settings',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        settings: user.settings || {}
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'servicehub-settings-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Настройки скачаны');
+}
+
+function resetSettings() {
+    const user = currentUser();
+    if (!user) return;
+    if (!confirm('Сбросить все настройки к значениям по умолчанию?')) return;
+    const users = DB.users;
+    const i = users.findIndex(u => u.id === user.id);
+    users[i] = { ...users[i], settings: { ...DEFAULT_SETTINGS } };
+    DB.users = users;
+
+    applyThemeFromSettings(DEFAULT_SETTINGS);
+    applyCompactMode(DEFAULT_SETTINGS.compact);
+    applyFontSize(DEFAULT_SETTINGS.fontSize);
+    renderSettings();
+    toast('Настройки сброшены');
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function logoutAll() {
+    if (!confirm('Выйти из аккаунта на всех устройствах? Данные синхронизации сохранятся.')) return;
+    logout();
+}
+
+function updateStorageInfo() {
+    const infoEl = document.getElementById('storageInfo');
+    const fillEl = document.getElementById('storageBarFill');
+    if (!infoEl || !fillEl) return;
+
+    let total = 0;
+    const keys = ['sh_users','sh_services','sh_orders','sh_messages','sh_reviews','sh_notifs','sh_session','sh_gh'];
+    keys.forEach(k => {
+        const v = localStorage.getItem(k) || '';
+        total += new Blob([v]).size;
+    });
+
+    const LIMIT = 5 * 1024 * 1024;
+    const pct = Math.min(100, (total / LIMIT) * 100);
+
+    const fmt = bytes => {
+        if (bytes < 1024) return bytes + ' Б';
+        if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' КБ';
+        return (bytes/1024/1024).toFixed(2) + ' МБ';
+    };
+
+    infoEl.textContent = `Использовано ${fmt(total)} из ~${fmt(LIMIT)} (${pct.toFixed(1)}%)`;
+    fillEl.style.width = pct + '%';
+    fillEl.classList.toggle('warn', pct > 70);
+}
+
+function renderSettings() {
+    const user = currentUser();
+    if (!user) return;
+    const s = { ...DEFAULT_SETTINGS, ...(user.settings || {}) };
+
+    const setChk = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!val;
+    };
+    setChk('optCompact', s.compact);
+    setChk('optEmailNotif', s.emailNotif);
+    setChk('optPushNotif', s.pushNotif);
+    setChk('optReviewNotif', s.reviewNotif);
+    setChk('optMessageNotif', s.messageNotif);
+    setChk('optOrderNotif', s.orderNotif);
+    setChk('optShowEmail', s.showEmail);
+    setChk('optShowPhone', s.showPhone);
+    setChk('optShowCity', s.showCity);
+    setChk('optAcceptOrders', s.acceptOrders);
+    setChk('optAcceptMessages', s.acceptMessages);
+    setChk('optShowOnline', s.showOnline);
+
+    const setSel = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+    setSel('optLanguage', s.language);
+    setSel('optCurrency', s.currency);
+    setSel('optTimezone', s.timezone);
+
+    applyThemeFromSettings(s);
+    applyCompactMode(s.compact);
+    applyFontSize(s.fontSize);
+    updateStorageInfo();
+}
+
+function saveSetting(key, value) {
+    const user = currentUser();
+    if (!user) return;
+    const users = DB.users;
+    const idx = users.findIndex(u => u.id === user.id);
+    const settings = { ...DEFAULT_SETTINGS, ...(users[idx].settings || {}) };
+    settings[key] = value;
+    users[idx] = { ...users[idx], settings };
+    DB.users = users;
+    toast('Настройка сохранена');
+    if (DB.gh && DB.gh.token) syncPush(true);
 }
 
 /* =========================================================
@@ -2425,6 +3068,7 @@ function showDashTab(name) {
     if (btn) btn.classList.add('active');
 
     renderDashboard();
+    if (name === 'settings') updateStorageInfo();
 }
 
 function setServiceFilter(f) {
@@ -2642,10 +3286,9 @@ function deleteOrder(id) {
 }
 
 /* =========================================================
-   СООБЩЕНИЯ (чат-UI)
+   СООБЩЕНИЯ (чат)
    ========================================================= */
 function openMessageModal(toUserId) {
-    // Открываем сразу чат
     openDialog(toUserId);
 }
 function closeMessageModal() {
@@ -2653,7 +3296,6 @@ function closeMessageModal() {
 }
 function sendMessage(e) {
     e.preventDefault();
-    // legacy — используется только если кто-то вызовет старую модалку
     const user = currentUser();
     if (!user) return;
     const toId = document.getElementById('msgToUserId').value;
@@ -2664,6 +3306,11 @@ function sendMessage(e) {
 }
 
 function pushMessage(fromId, toId, text) {
+    const toUser = DB.users.find(u => u.id === toId);
+    if (toUser && toUser.settings && toUser.settings.acceptMessages === false) {
+        toast('Пользователь не принимает сообщения', true);
+        return false;
+    }
     const list = DB.messages;
     list.push({
         id: uid('m'),
@@ -2675,6 +3322,7 @@ function pushMessage(fromId, toId, text) {
     const fromUser = DB.users.find(u => u.id === fromId);
     pushNotif(toId, '💬', 'Новое сообщение',
               (fromUser ? fromUser.name : 'Кто-то') + ': ' + text.slice(0, 80));
+    return true;
 }
 
 function renderMessages() {
@@ -2718,13 +3366,11 @@ function renderMessages() {
     `).join('');
 }
 
-let _chatOtherId = null;
 function openDialog(otherId) {
     const user = currentUser();
     if (!user) { openAuth('login'); return; }
     const other = DB.users.find(u => u.id === otherId);
     if (!other) { toast('Пользователь не найден', true); return; }
-    _chatOtherId = otherId;
     document.getElementById('chatToUserId').value = otherId;
     document.getElementById('chatTitle').textContent = '💬 ' + other.name;
 
@@ -2735,7 +3381,6 @@ function openDialog(otherId) {
 }
 function closeChatModal() {
     document.getElementById('chatModal').classList.remove('active');
-    _chatOtherId = null;
     renderDashboard();
     renderHeader();
 }
@@ -2780,7 +3425,7 @@ function sendChatMessage(e) {
     const text = input.value.trim();
     if (!text) return;
 
-    pushMessage(user.id, toId, text);
+    if (!pushMessage(user.id, toId, text)) return;
     input.value = '';
     renderChatMessages(toId);
     renderHeader();
@@ -2925,7 +3570,7 @@ function renderAnalytics() {
     } else {
         topBox.innerHTML = top.map(s => `
             <div class="list-item">
-                <div class="li-icon">${s.image ? `<div style="width:40px;height:40px;border-radius:8px;${bgStyle(s.image).replace('style="','').replace('"','')}"></div>` : '🛠'}</div>
+                <div class="li-icon">${s.image ? `<div style="width:40px;height:40px;border-radius:8px;${bgStyle(s.image).replace('style="','').replace(/"$/,'')}"></div>` : '🛠'}</div>
                 <div class="li-body">
                     <div class="li-title">${escapeHtml(s.title)}</div>
                     <div class="li-text">👁 ${s.views || 0} просмотров</div>
@@ -3072,39 +3717,8 @@ function removeAvatar() {
 }
 
 /* =========================================================
-   НАСТРОЙКИ
+   ЭКСПОРТ ДАННЫХ
    ========================================================= */
-function renderSettings() {
-    const user = currentUser();
-    if (!user) return;
-    const s = user.settings || {};
-    document.getElementById('optDarkTheme').checked   = !!s.darkTheme;
-    document.getElementById('optCompact').checked     = !!s.compact;
-    document.getElementById('optEmailNotif').checked  = s.emailNotif !== false;
-    document.getElementById('optPushNotif').checked   = !!s.pushNotif;
-    document.getElementById('optReviewNotif').checked = s.reviewNotif !== false;
-    document.getElementById('optShowEmail').checked   = !!s.showEmail;
-    document.getElementById('optShowPhone').checked   = !!s.showPhone;
-    document.getElementById('optAcceptOrders').checked = s.acceptOrders !== false;
-
-    document.documentElement.setAttribute('data-theme', s.darkTheme ? 'dark' : 'light');
-}
-function saveSetting(key, value) {
-    const user = currentUser();
-    if (!user) return;
-    const users = DB.users;
-    const idx = users.findIndex(u => u.id === user.id);
-    const settings = { ...(users[idx].settings || {}) };
-    settings[key] = value;
-    users[idx] = { ...users[idx], settings };
-    DB.users = users;
-    toast('Настройка сохранена');
-    if (DB.gh && DB.gh.token) syncPush(true);
-}
-function toggleDarkTheme(on) {
-    saveSetting('darkTheme', on);
-    document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
-}
 function exportMyData() {
     const user = currentUser();
     if (!user) return;
@@ -3165,7 +3779,6 @@ async function changePassword(e) {
     const newHash = await hashPassword(newPwd);
     const oldHash = await hashPassword(oldPwd);
 
-    // поддержка миграции старого хеша
     const users = DB.users;
     const idx = users.findIndex(u => u.id === user.id);
     const currentHash = users[idx].password;
@@ -3332,20 +3945,21 @@ document.addEventListener('keydown', e => {
 });
 
 /* =========================================================
-   ТЕМА
+   ТЕМА И ИНИЦИАЛИЗАЦИЯ
    ========================================================= */
 function applyInitialTheme() {
     const user = currentUser();
-    const dark = user?.settings?.darkTheme;
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    applyThemeFromSettings(user ? user.settings : DEFAULT_SETTINGS);
 }
 
-/* =========================================================
-   ИНИЦИАЛИЗАЦИЯ
-   ========================================================= */
 (function init() {
     localStorage.removeItem('sh_seeded');
     applyInitialTheme();
+    const u = currentUser();
+    if (u?.settings) {
+        applyCompactMode(u.settings.compact);
+        applyFontSize(u.settings.fontSize);
+    }
     renderHeader();
     renderHome();
     updatePriceLabel();
