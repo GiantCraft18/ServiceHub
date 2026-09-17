@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ServiceHub — платформа услуг с личным кабинетом">
+<meta name="description" content="ServiceHub — платформа услуг с продвинутым личным кабинетом">
 <title>ServiceHub — платформа услуг</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,9 +20,18 @@
         --danger: #e53e3e;
         --success: #38a169;
         --warning: #dd6b20;
+        --info: #3182ce;
         --radius: 12px;
         --shadow: 0 4px 20px rgba(0,0,0,0.08);
         --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+    }
+
+    html[data-theme="dark"] {
+        --bg: #1a1a2e;
+        --card: #252541;
+        --text: #e2e8f0;
+        --muted: #a0aec0;
+        --border: #3a3a5c;
     }
 
     body {
@@ -33,24 +42,20 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        transition: background 0.3s, color 0.3s;
     }
 
     /* =====================================================
        HEADER
        ===================================================== */
     header {
-        background: rgba(255,255,255,0.98);
+        background: var(--card);
         backdrop-filter: blur(10px);
         padding: 0.8rem 2rem;
         box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+        position: sticky; top: 0; z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 1rem;
     }
     .logo {
         font-size: 1.4rem; font-weight: 700;
@@ -72,6 +77,24 @@
 
     .user-info { display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; }
     .user-info .name { font-weight: 600; color: var(--primary-dark); }
+
+    .notif-bell {
+        position: relative;
+        background: none; border: none; cursor: pointer;
+        font-size: 1.3rem; padding: 0.3rem;
+        border-radius: 50%; transition: background 0.2s;
+    }
+    .notif-bell:hover { background: var(--bg); }
+    .notif-badge {
+        position: absolute; top: -2px; right: -2px;
+        background: var(--danger); color: #fff;
+        font-size: 0.65rem; font-weight: 700;
+        min-width: 18px; height: 18px;
+        border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0 4px;
+    }
+
     .avatar {
         width: 38px; height: 38px; border-radius: 50%;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -79,7 +102,7 @@
         font-weight: 700; font-size: 0.9rem;
         cursor: pointer; transition: transform 0.2s;
         background-size: cover; background-position: center;
-        border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        border: 2px solid var(--card); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .avatar:hover { transform: scale(1.08); }
 
@@ -88,8 +111,9 @@
         background: none; border: none; cursor: pointer;
         font-family: inherit; padding: 0.3rem;
         border-radius: 50px; transition: background 0.2s;
+        color: inherit;
     }
-    .user-menu-btn:hover { background: #f0f4ff; }
+    .user-menu-btn:hover { background: var(--bg); }
 
     /* =====================================================
        MAIN
@@ -103,7 +127,6 @@
         to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* HERO */
     .hero {
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #fff; border-radius: var(--radius);
@@ -116,7 +139,7 @@
                     radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 40%);
         pointer-events: none;
     }
-    .hero h2, .hero p, .hero .hero-actions { position: relative; }
+    .hero > * { position: relative; }
     .hero h2 { font-size: 2.2rem; margin-bottom: 0.8rem; }
     .hero p { font-size: 1.1rem; opacity: 0.95; max-width: 620px; margin: 0 auto; }
 
@@ -126,9 +149,7 @@
         flex-wrap: wrap; gap: 1rem;
     }
 
-    /* =====================================================
-       BUTTONS
-       ===================================================== */
+    /* BUTTONS */
     .btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
         padding: 0.7rem 1.5rem;
@@ -143,7 +164,6 @@
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(102,126,234,0.5); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
-    .btn-lg { padding: 0.9rem 2rem; font-size: 1rem; }
     .btn-outline {
         background: transparent; color: var(--primary);
         border: 2px solid var(--primary); box-shadow: none;
@@ -157,9 +177,7 @@
     .btn-ghost:hover { background: var(--bg); color: var(--primary-dark); }
     .btn-block { width: 100%; }
 
-    /* =====================================================
-       CARDS / GRID
-       ===================================================== */
+    /* CARDS */
     .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -186,8 +204,23 @@
         display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    .card .meta { font-size: 0.8rem; color: #999; }
+    .card .meta { font-size: 0.8rem; color: var(--muted); }
     .card-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+
+    .badge {
+        display: inline-block;
+        padding: 0.15rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    .badge-green  { background: #c6f6d5; color: #22543d; }
+    .badge-orange { background: #feebc8; color: #7b341e; }
+    .badge-red    { background: #fed7d7; color: #742a2a; }
+    .badge-blue   { background: #bee3f8; color: #2c5282; }
+    .badge-gray   { background: #e2e8f0; color: #4a5568; }
 
     .empty {
         text-align: center; padding: 3rem 1rem; color: var(--muted);
@@ -195,9 +228,7 @@
     }
     .empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
 
-    /* =====================================================
-       FORM
-       ===================================================== */
+    /* FORM */
     .form-container {
         max-width: 460px; margin: 2rem auto; background: var(--card);
         padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow);
@@ -211,13 +242,15 @@
     .form-group input, .form-group textarea, .form-group select {
         width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--border);
         border-radius: 8px; font-size: 1rem; font-family: inherit;
-        transition: border-color 0.2s, box-shadow 0.2s; background: #fff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: var(--card); color: var(--text);
     }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
         outline: none; border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
     }
     .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
     .form-footer { margin-top: 1.2rem; text-align: center; font-size: 0.9rem; color: var(--muted); }
     .form-footer button.link {
@@ -227,14 +260,13 @@
     .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
     .success { color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; }
 
-    /* IMAGE UPLOAD */
     .image-upload {
         border: 2px dashed var(--border); border-radius: 10px;
         padding: 1.2rem; text-align: center; cursor: pointer;
         transition: border-color 0.2s, background 0.2s;
-        background: #fafbfd; display: block;
+        background: var(--bg); display: block;
     }
-    .image-upload:hover { border-color: var(--primary); background: #f0f4ff; }
+    .image-upload:hover { border-color: var(--primary); }
     .image-upload.has-image { padding: 0; border-style: solid; overflow: hidden; }
     .image-preview {
         width: 100%; max-height: 220px; object-fit: cover; display: block;
@@ -243,9 +275,7 @@
     .image-upload-hint { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
     .image-upload input[type=file] { display: none; }
 
-    /* =====================================================
-       МОДАЛКА
-       ===================================================== */
+    /* MODAL */
     .modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.55);
         display: none; align-items: center; justify-content: center;
@@ -253,7 +283,7 @@
     }
     .modal-overlay.active { display: flex; }
     .modal {
-        background: #fff; border-radius: var(--radius); padding: 2rem;
+        background: var(--card); border-radius: var(--radius); padding: 2rem;
         max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto;
         animation: slideUp 0.3s ease;
     }
@@ -268,7 +298,7 @@
     }
 
     /* =====================================================
-       ЛИЧНЫЙ КАБИНЕТ
+       DASHBOARD
        ===================================================== */
     .dashboard-layout {
         display: grid;
@@ -277,7 +307,6 @@
         align-items: start;
     }
 
-    /* Сайдбар */
     .dash-sidebar {
         background: var(--card);
         border-radius: var(--radius);
@@ -292,6 +321,7 @@
         text-align: center;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #fff;
+        cursor: pointer;
     }
     .dash-avatar {
         width: 84px; height: 84px; border-radius: 50%;
@@ -301,7 +331,7 @@
         font-size: 2rem; font-weight: 700;
         border: 3px solid rgba(255,255,255,0.6);
         background-size: cover; background-position: center;
-        cursor: pointer; position: relative;
+        position: relative;
         transition: transform 0.2s;
     }
     .dash-avatar:hover { transform: scale(1.05); }
@@ -317,38 +347,45 @@
     }
     .dash-profile h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
     .dash-profile p { font-size: 0.8rem; opacity: 0.9; word-break: break-all; }
-
-    .dash-menu {
-        list-style: none;
-        padding: 0.6rem 0;
+    .dash-status {
+        display: inline-block;
+        margin-top: 0.5rem;
+        padding: 0.15rem 0.6rem;
+        background: rgba(255,255,255,0.25);
+        border-radius: 20px;
+        font-size: 0.7rem;
     }
+
+    .dash-menu { list-style: none; padding: 0.6rem 0; }
     .dash-menu li { margin: 0; }
     .dash-menu button {
-        width: 100%;
-        background: none;
-        border: none;
-        text-align: left;
-        padding: 0.75rem 1.4rem;
-        font-family: inherit;
-        font-size: 0.95rem;
-        color: var(--text);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
+        width: 100%; background: none; border: none;
+        text-align: left; padding: 0.7rem 1.4rem;
+        font-family: inherit; font-size: 0.92rem;
+        color: var(--text); cursor: pointer;
+        display: flex; align-items: center; gap: 0.7rem;
         transition: background 0.2s, color 0.2s;
         border-left: 3px solid transparent;
+        position: relative;
     }
-    .dash-menu button:hover { background: #f0f4ff; color: var(--primary); }
+    .dash-menu button:hover { background: var(--bg); color: var(--primary); }
     .dash-menu button.active {
-        background: #f0f4ff;
+        background: rgba(102,126,234,0.1);
         color: var(--primary);
         font-weight: 600;
         border-left-color: var(--primary);
     }
-    .dash-menu .icon { font-size: 1.1rem; width: 22px; text-align: center; }
+    .dash-menu .icon { font-size: 1.05rem; width: 22px; text-align: center; }
+    .dash-menu .count {
+        margin-left: auto;
+        background: var(--primary);
+        color: #fff;
+        font-size: 0.7rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+    }
 
-    /* Основная область */
     .dash-content {
         background: var(--card);
         border-radius: var(--radius);
@@ -361,22 +398,15 @@
     .dash-tab.active { display: block; }
 
     .dash-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 1rem;
+        margin-bottom: 1.5rem; padding-bottom: 1rem;
         border-bottom: 1px solid var(--border);
     }
-    .dash-header h2 {
-        color: var(--primary-dark);
-        font-size: 1.4rem;
-    }
+    .dash-header h2 { color: var(--primary-dark); font-size: 1.4rem; }
     .dash-header p { color: var(--muted); font-size: 0.9rem; }
 
-    /* Статистика */
+    /* STATS */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -384,7 +414,7 @@
         margin-bottom: 1.5rem;
     }
     .stat-card {
-        background: linear-gradient(135deg, #f7f9fc, #eef2f9);
+        background: var(--bg);
         border-radius: 10px;
         padding: 1.1rem 1.2rem;
         border-left: 4px solid var(--primary);
@@ -392,14 +422,11 @@
     }
     .stat-card:hover { transform: translateY(-3px); }
     .stat-card .value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--primary-dark);
-        line-height: 1.1;
+        font-size: 1.8rem; font-weight: 700;
+        color: var(--primary-dark); line-height: 1.1;
     }
     .stat-card .label {
-        font-size: 0.8rem;
-        color: var(--muted);
+        font-size: 0.78rem; color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-top: 0.2rem;
@@ -407,71 +434,190 @@
     .stat-card.green  { border-left-color: var(--success); }
     .stat-card.orange { border-left-color: var(--warning); }
     .stat-card.purple { border-left-color: var(--secondary); }
+    .stat-card.blue   { border-left-color: var(--info); }
 
-    /* Профиль-форма */
-    .profile-grid {
-        display: grid;
-        grid-template-columns: 220px 1fr;
-        gap: 1.8rem;
+    /* LIST ITEMS (заявки, отзывы, уведомления) */
+    .list-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1rem;
+        background: var(--bg);
+        border-radius: 10px;
+        margin-bottom: 0.7rem;
+        transition: transform 0.15s;
+        border-left: 3px solid transparent;
     }
-    .profile-avatar-block {
-        text-align: center;
-    }
-    .profile-avatar-big {
-        width: 160px; height: 160px; border-radius: 50%;
-        margin: 0 auto 1rem;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #fff;
+    .list-item:hover { transform: translateX(3px); }
+    .list-item.unread { border-left-color: var(--primary); background: rgba(102,126,234,0.08); }
+    .list-item .li-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        width: 40px; height: 40px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 3.5rem; font-weight: 700;
-        background-size: cover; background-position: center;
-        box-shadow: 0 8px 24px rgba(102,126,234,0.35);
-        border: 4px solid #fff;
+        background: var(--card);
+        border-radius: 50%;
     }
-    .profile-avatar-big.has-image { color: transparent; }
-
-    /* Адаптив */
-    @media (max-width: 900px) {
-        .dashboard-layout {
-            grid-template-columns: 1fr;
-        }
-        .dash-sidebar {
-            position: static;
-        }
-        .dash-menu {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 0.3rem;
-            gap: 0.2rem;
-        }
-        .dash-menu li { flex: 1 1 auto; }
-        .dash-menu button {
-            border-left: none;
-            border-bottom: 3px solid transparent;
-            justify-content: center;
-            padding: 0.6rem 0.9rem;
-            border-radius: 8px;
-        }
-        .dash-menu button.active {
-            border-left: none;
-            border-bottom-color: var(--primary);
-            background: #f0f4ff;
-        }
-        .profile-grid {
-            grid-template-columns: 1fr;
-        }
+    .list-item .li-body { flex: 1; min-width: 0; }
+    .list-item .li-title {
+        font-weight: 600; color: var(--primary-dark);
+        margin-bottom: 0.2rem;
+    }
+    .list-item .li-text {
+        font-size: 0.9rem; color: var(--muted);
+        overflow: hidden; text-overflow: ellipsis;
+    }
+    .list-item .li-meta {
+        font-size: 0.75rem; color: var(--muted);
+        margin-top: 0.3rem;
+    }
+    .list-item .li-actions {
+        display: flex; gap: 0.4rem; flex-shrink: 0;
+        flex-wrap: wrap;
     }
 
-    /* =====================================================
-       SYNC STATUS / TOAST / FOOTER
-       ===================================================== */
+    /* TABS фильтры услуг */
+    .filter-tabs {
+        display: flex; gap: 0.4rem; flex-wrap: wrap;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.6rem;
+    }
+    .filter-tabs button {
+        background: none; border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.85rem;
+        color: var(--muted);
+        transition: background 0.2s, color 0.2s;
+    }
+    .filter-tabs button:hover { background: var(--bg); color: var(--primary); }
+    .filter-tabs button.active {
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Соцсети */
+    .socials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.7rem;
+    }
+    .social-field {
+        display: flex; align-items: center; gap: 0.5rem;
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 0.5rem 0.8rem;
+    }
+    .social-field .ico { font-size: 1.1rem; }
+    .social-field input {
+        border: none;
+        background: transparent;
+        flex: 1;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: var(--text);
+        padding: 0.2rem 0;
+        min-width: 0;
+    }
+    .social-field input:focus { outline: none; }
+
+    /* Toggle switch */
+    .toggle-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.9rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-row .info h4 { font-size: 0.95rem; color: var(--text); margin-bottom: 0.15rem; }
+    .toggle-row .info p { font-size: 0.82rem; color: var(--muted); }
+
+    .switch {
+        position: relative;
+        width: 46px; height: 26px;
+        flex-shrink: 0;
+    }
+    .switch input { display: none; }
+    .switch .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: #cbd5e0;
+        border-radius: 26px;
+        transition: background 0.3s;
+    }
+    .switch .slider::before {
+        content: '';
+        position: absolute;
+        width: 20px; height: 20px;
+        left: 3px; top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .switch input:checked + .slider { background: var(--primary); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+
+    /* Chart bars (простая визуализация) */
+    .chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 100px;
+        padding: 0.5rem 0;
+    }
+    .chart .bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--primary), var(--secondary));
+        border-radius: 4px 4px 0 0;
+        min-height: 4px;
+        position: relative;
+        transition: opacity 0.2s;
+    }
+    .chart .bar:hover { opacity: 0.8; }
+    .chart .bar::after {
+        content: attr(data-label);
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.65rem;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    /* Скелетон для сессий/соцсетей */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+    .info-card {
+        padding: 1rem 1.2rem;
+        background: var(--bg);
+        border-radius: 10px;
+    }
+    .info-card .label {
+        font-size: 0.75rem; color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.3rem;
+    }
+    .info-card .value {
+        font-size: 1rem;
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    /* Sync status / Toast */
     .sync-status {
         font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
         background: #edf2f7; color: var(--muted);
     }
-    .sync-status.online  { background: #c6f6d5; color: #22543d; }
-    .sync-status.offline { background: #fed7d7; color: #742a2a; }
-    .sync-status.syncing { background: #feebc8; color: #7b341e; }
 
     .toast {
         position: fixed; bottom: 2rem; right: 2rem;
@@ -493,6 +639,33 @@
     /* =====================================================
        ГЛОБАЛЬНЫЙ АДАПТИВ
        ===================================================== */
+    @media (max-width: 900px) {
+        .dashboard-layout { grid-template-columns: 1fr; }
+        .dash-sidebar { position: static; }
+        .dash-menu {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.3rem;
+            gap: 0.2rem;
+        }
+        .dash-menu li { flex: 1 1 auto; }
+        .dash-menu button {
+            border-left: none;
+            border-bottom: 3px solid transparent;
+            justify-content: center;
+            padding: 0.6rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .dash-menu button.active {
+            border-left: none;
+            border-bottom-color: var(--primary);
+            background: rgba(102,126,234,0.1);
+        }
+        .dash-menu .count { display: none; }
+        .dash-menu .icon { width: auto; }
+    }
+
     @media (max-width: 768px) {
         header { padding: 0.8rem 1rem; }
         .logo { font-size: 1.15rem; }
@@ -502,20 +675,22 @@
         .hero h2 { font-size: 1.6rem; }
         .hero p { font-size: 1rem; }
         main { padding: 1.2rem 0.8rem; }
-        .section-title { font-size: 1.3rem; }
         .form-container { padding: 1.5rem; margin: 1rem auto; }
         .modal { padding: 1.3rem; }
         .toast { left: 1rem; right: 1rem; bottom: 1rem; text-align: center; max-width: none; }
         .user-info .name { display: none; }
         .dash-content { padding: 1.2rem; }
         .dash-header h2 { font-size: 1.2rem; }
+        .form-row { grid-template-columns: 1fr; }
+        .list-item { flex-wrap: wrap; }
     }
     @media (max-width: 480px) {
         .grid { grid-template-columns: 1fr; }
         .hero h2 { font-size: 1.35rem; }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
         .stat-card .value { font-size: 1.5rem; }
-        .profile-avatar-big { width: 120px; height: 120px; font-size: 2.5rem; }
+        .dash-menu button { font-size: 0.78rem; padding: 0.5rem 0.5rem; }
+        .dash-menu .icon { display: none; }
     }
 </style>
 </head>
@@ -545,13 +720,18 @@
         <div class="hero">
             <h2>Найдите нужную услугу</h2>
             <p>Платформа, где каждый может предложить свои услуги с фото, описанием и ценой. Регистрируйтесь и добавляйте услуги бесплатно.</p>
-            <div class="hero-actions" style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="btn" onclick="showPage('catalog')">Смотреть услуги</button>
                 <button class="btn btn-outline" style="color:#fff;border-color:#fff;" onclick="openAuth('register')">Стать исполнителем</button>
             </div>
         </div>
-        <h2 class="section-title">Популярные услуги</h2>
+        <h2 class="section-title">Свежие услуги</h2>
         <div class="grid" id="homeServices"></div>
+        <div id="homeEmpty" class="empty" style="display:none;">
+            <div class="empty-icon">📭</div>
+            Пока нет ни одной услуги.<br>
+            <button class="btn" style="margin-top:1rem;" onclick="openAuth('register')">Зарегистрируйтесь и добавьте первую</button>
+        </div>
     </section>
 
     <!-- ==================== CATALOG ==================== -->
@@ -559,13 +739,13 @@
         <div class="section-title">
             <h2>Все услуги</h2>
             <input type="text" id="searchInput" placeholder="🔍 Поиск услуги..."
-                   style="padding:0.6rem 1rem; border:1px solid var(--border); border-radius:50px; font-size:0.95rem; min-width:220px;"
+                   style="padding:0.6rem 1rem; border:1px solid var(--border); border-radius:50px; font-size:0.95rem; min-width:220px; background:var(--card); color:var(--text);"
                    oninput="renderCatalog()">
         </div>
         <div class="grid" id="catalogServices"></div>
         <div id="catalogEmpty" class="empty" style="display:none;">
             <div class="empty-icon">🔍</div>
-            Услуг пока нет. Станьте первым исполнителем!
+            <span id="catalogEmptyText">Услуг пока нет.</span>
         </div>
     </section>
 
@@ -575,49 +755,36 @@
 
             <!-- Сайдбар -->
             <aside class="dash-sidebar">
-                <div class="dash-profile">
-                    <div class="dash-avatar" id="dashAvatar" onclick="showDashTab('profile')" title="Изменить аватар"></div>
+                <div class="dash-profile" onclick="showDashTab('profile')">
+                    <div class="dash-avatar" id="dashAvatar"></div>
                     <h3 id="dashName">—</h3>
                     <p id="dashEmail">—</p>
+                    <div class="dash-status" id="dashStatus">Участник</div>
                 </div>
-                <ul class="dash-menu">
-                    <li>
-                        <button class="active" data-tab="overview" onclick="showDashTab('overview')">
-                            <span class="icon">📊</span> Обзор
-                        </button>
-                    </li>
-                    <li>
-                        <button data-tab="services" onclick="showDashTab('services')">
-                            <span class="icon">🛠</span> Мои услуги
-                        </button>
-                    </li>
-                    <li>
-                        <button data-tab="profile" onclick="showDashTab('profile')">
-                            <span class="icon">👤</span> Профиль
-                        </button>
-                    </li>
-                    <li>
-                        <button data-tab="security" onclick="showDashTab('security')">
-                            <span class="icon">🔒</span> Безопасность
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="logout()" style="color:var(--danger);">
-                            <span class="icon">🚪</span> Выйти
-                        </button>
-                    </li>
+                <ul class="dash-menu" id="dashMenu">
+                    <li><button class="active" data-tab="overview"   onclick="showDashTab('overview')"><span class="icon">📊</span> Обзор</button></li>
+                    <li><button data-tab="services"  onclick="showDashTab('services')"><span class="icon">🛠</span> Мои услуги<span class="count" id="cntServices"></span></button></li>
+                    <li><button data-tab="orders"    onclick="showDashTab('orders')"><span class="icon">📥</span> Заявки<span class="count" id="cntOrders"></span></button></li>
+                    <li><button data-tab="myorders"  onclick="showDashTab('myorders')"><span class="icon">📤</span> Мои заявки</button></li>
+                    <li><button data-tab="messages"  onclick="showDashTab('messages')"><span class="icon">💬</span> Сообщения<span class="count" id="cntMessages"></span></button></li>
+                    <li><button data-tab="reviews"   onclick="showDashTab('reviews')"><span class="icon">⭐</span> Отзывы<span class="count" id="cntReviews"></span></button></li>
+                    <li><button data-tab="analytics" onclick="showDashTab('analytics')"><span class="icon">📈</span> Аналитика</button></li>
+                    <li><button data-tab="profile"   onclick="showDashTab('profile')"><span class="icon">👤</span> Профиль</button></li>
+                    <li><button data-tab="settings"  onclick="showDashTab('settings')"><span class="icon">⚙</span> Настройки</button></li>
+                    <li><button data-tab="security"  onclick="showDashTab('security')"><span class="icon">🔒</span> Безопасность</button></li>
+                    <li><button onclick="logout()" style="color:var(--danger);"><span class="icon">🚪</span> Выйти</button></li>
                 </ul>
             </aside>
 
             <!-- Контент -->
             <div class="dash-content">
 
-                <!-- ОБЗОР -->
+                <!-- ============ ОБЗОР ============ -->
                 <div class="dash-tab active" data-tab="overview">
                     <div class="dash-header">
                         <div>
                             <h2>Обзор</h2>
-                            <p>Краткая сводка по вашему аккаунту</p>
+                            <p>Краткая сводка по аккаунту</p>
                         </div>
                         <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
                     </div>
@@ -625,12 +792,17 @@
                     <div class="stats-grid" id="statsGrid"></div>
 
                     <h3 style="color:var(--primary-dark); margin: 1rem 0 0.8rem; font-size:1.1rem;">
-                        Последние услуги
+                        Активность за неделю
                     </h3>
-                    <div id="recentServices"></div>
+                    <div class="chart" id="overviewChart"></div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.8rem; font-size:1.1rem;">
+                        Последние события
+                    </h3>
+                    <div id="recentActivity"></div>
                 </div>
 
-                <!-- МОИ УСЛУГИ -->
+                <!-- ============ МОИ УСЛУГИ ============ -->
                 <div class="dash-tab" data-tab="services">
                     <div class="dash-header">
                         <div>
@@ -638,6 +810,27 @@
                             <p>Управляйте своими предложениями</p>
                         </div>
                         <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
+                    </div>
+
+                    <div class="filter-tabs" id="serviceFilters">
+                        <button class="active" data-f="all"     onclick="setServiceFilter('all')">Все</button>
+                        <button data-f="active"    onclick="setServiceFilter('active')">Активные</button>
+                        <button data-f="paused"    onclick="setServiceFilter('paused')">На паузе</button>
+                        <button data-f="draft"     onclick="setServiceFilter('draft')">Черновики</button>
+                    </div>
+
+                    <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1rem;">
+                        <input type="text" id="serviceSearch" placeholder="🔍 Поиск по названию..."
+                               style="flex:1; min-width:200px; padding:0.6rem 1rem; border:1px solid var(--border); border-radius:50px; font-size:0.9rem; background:var(--card); color:var(--text);"
+                               oninput="renderMyServices()">
+                        <select id="serviceSort" onchange="renderMyServices()"
+                                style="padding:0.6rem 1rem; border:1px solid var(--border); border-radius:50px; background:var(--card); color:var(--text); font-family:inherit;">
+                            <option value="new">Сначала новые</option>
+                            <option value="old">Сначала старые</option>
+                            <option value="priceHigh">Цена ↓</option>
+                            <option value="priceLow">Цена ↑</option>
+                            <option value="title">По названию</option>
+                        </select>
                     </div>
 
                     <div class="grid" id="myServices"></div>
@@ -648,20 +841,88 @@
                     </div>
                 </div>
 
-                <!-- ПРОФИЛЬ -->
+                <!-- ============ ЗАЯВКИ (входящие) ============ -->
+                <div class="dash-tab" data-tab="orders">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Входящие заявки</h2>
+                            <p>Заявки на ваши услуги от других пользователей</p>
+                        </div>
+                    </div>
+                    <div id="ordersList"></div>
+                </div>
+
+                <!-- ============ МОИ ЗАЯВКИ ============ -->
+                <div class="dash-tab" data-tab="myorders">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Мои заявки</h2>
+                            <p>Заявки, которые вы отправили другим исполнителям</p>
+                        </div>
+                    </div>
+                    <div id="myOrdersList"></div>
+                </div>
+
+                <!-- ============ СООБЩЕНИЯ ============ -->
+                <div class="dash-tab" data-tab="messages">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Сообщения</h2>
+                            <p>Ваши диалоги с другими пользователями</p>
+                        </div>
+                    </div>
+                    <div id="messagesList"></div>
+                </div>
+
+                <!-- ============ ОТЗЫВЫ ============ -->
+                <div class="dash-tab" data-tab="reviews">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Отзывы</h2>
+                            <p>Отзывы, оставленные вам</p>
+                        </div>
+                        <div id="avgRating" style="font-size:1.2rem; font-weight:700; color:var(--primary-dark);"></div>
+                    </div>
+                    <div id="reviewsList"></div>
+                </div>
+
+                <!-- ============ АНАЛИТИКА ============ -->
+                <div class="dash-tab" data-tab="analytics">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Аналитика</h2>
+                            <p>Просмотры, заявки и конверсия</p>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" id="analyticsStats"></div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1rem 0 0.8rem; font-size:1.1rem;">
+                        Просмотры услуг за 7 дней
+                    </h3>
+                    <div class="chart" id="analyticsChart"></div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.8rem; font-size:1.1rem;">
+                        Топ услуг по просмотрам
+                    </h3>
+                    <div id="topServices"></div>
+                </div>
+
+                <!-- ============ ПРОФИЛЬ ============ -->
                 <div class="dash-tab" data-tab="profile">
                     <div class="dash-header">
                         <div>
                             <h2>Профиль</h2>
-                            <p>Настройте личные данные</p>
+                            <p>Настройте личные данные и контакты</p>
                         </div>
                     </div>
 
-                    <div class="profile-grid">
-                        <div class="profile-avatar-block">
-                            <div class="profile-avatar-big" id="profileAvatarBig"></div>
+                    <div style="display:grid; grid-template-columns: 220px 1fr; gap:1.8rem; align-items:start;" id="profileGrid">
+                        <div style="text-align:center;">
+                            <div class="dash-avatar" id="profileAvatarBig"
+                                 style="width:160px;height:160px;font-size:3.5rem;border-width:4px;margin-bottom:1rem;background:linear-gradient(135deg,var(--primary),var(--secondary));"></div>
                             <label class="btn btn-outline btn-sm" style="cursor:pointer;">
-                                📷 Загрузить аватар
+                                📷 Аватар
                                 <input type="file" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
                             </label>
                             <div style="margin-top:0.5rem;">
@@ -669,25 +930,87 @@
                             </div>
                         </div>
 
-                        <form onsubmit="saveProfile(event)">
-                            <div class="form-group">
-                                <label for="profileName">Имя *</label>
-                                <input type="text" id="profileName" required maxlength="60">
+                        <form onsubmit="saveProfile(event)" id="profileForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileName">Имя *</label>
+                                    <input type="text" id="profileName" required maxlength="60">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileSurname">Фамилия</label>
+                                    <input type="text" id="profileSurname" maxlength="60">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="profileEmail">Email *</label>
-                                <input type="email" id="profileEmail" required>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileEmail">Email *</label>
+                                    <input type="email" id="profileEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profilePhone">Телефон</label>
+                                    <input type="tel" id="profilePhone" maxlength="20" placeholder="+7 (___) ___-__-__">
+                                </div>
                             </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileCity">Город</label>
+                                    <input type="text" id="profileCity" maxlength="60" placeholder="Москва">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileBirthday">Дата рождения</label>
+                                    <input type="date" id="profileBirthday">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profileStatus">Статус</label>
+                                <select id="profileStatus">
+                                    <option value="Участник">Участник</option>
+                                    <option value="Исполнитель">Исполнитель</option>
+                                    <option value="Профессионал">Профессионал</option>
+                                    <option value="Компания">Компания</option>
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label for="profileBio">О себе</label>
-                                <textarea id="profileBio" maxlength="300"
-                                          placeholder="Коротко расскажите о себе (до 300 символов)"></textarea>
+                                <textarea id="profileBio" maxlength="500"
+                                          placeholder="Расскажите о своём опыте и навыках (до 500 символов)"></textarea>
                             </div>
+
                             <div class="form-group">
-                                <label for="profilePhone">Телефон</label>
-                                <input type="tel" id="profilePhone" maxlength="20" placeholder="+7 (___) ___-__-__">
+                                <label>Социальные сети</label>
+                                <div class="socials-grid">
+                                    <div class="social-field">
+                                        <span class="ico">📷</span>
+                                        <input type="text" id="socialInstagram" placeholder="Instagram">
+                                    </div>
+                                    <div class="social-field">
+                                        <span class="ico">📘</span>
+                                        <input type="text" id="socialFacebook" placeholder="Facebook">
+                                    </div>
+                                    <div class="social-field">
+                                        <span class="ico">✈️</span>
+                                        <input type="text" id="socialTelegram" placeholder="@telegram">
+                                    </div>
+                                    <div class="social-field">
+                                        <span class="ico">💼</span>
+                                        <input type="text" id="socialLinkedin" placeholder="LinkedIn">
+                                    </div>
+                                    <div class="social-field">
+                                        <span class="ico">🐙</span>
+                                        <input type="text" id="socialGithub" placeholder="GitHub">
+                                    </div>
+                                    <div class="social-field">
+                                        <span class="ico">🌐</span>
+                                        <input type="text" id="socialWebsite" placeholder="Сайт">
+                                    </div>
+                                </div>
                             </div>
-                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+
+                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:1rem;">
                                 <button type="submit" class="btn">💾 Сохранить</button>
                                 <button type="button" class="btn btn-ghost" onclick="renderProfileForm()">Отменить</button>
                             </div>
@@ -696,22 +1019,125 @@
                     </div>
                 </div>
 
-                <!-- БЕЗОПАСНОСТЬ -->
+                <!-- ============ НАСТРОЙКИ ============ -->
+                <div class="dash-tab" data-tab="settings">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Настройки</h2>
+                            <p>Внешний вид, уведомления и приватность</p>
+                        </div>
+                    </div>
+
+                    <h3 style="color:var(--primary-dark); margin-bottom:0.5rem; font-size:1.05rem;">Внешний вид</h3>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Тёмная тема</h4>
+                            <p>Комфортный просмотр ночью</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optDarkTheme" onchange="toggleDarkTheme(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Компактный режим</h4>
+                            <p>Меньше отступов, больше контента</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optCompact" onchange="saveSetting('compact', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Уведомления</h3>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Email-уведомления</h4>
+                            <p>Получать письма о новых заявках</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optEmailNotif" onchange="saveSetting('emailNotif', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Push-уведомления</h4>
+                            <p>Уведомления в браузере</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optPushNotif" onchange="saveSetting('pushNotif', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Уведомления об отзывах</h4>
+                            <p>Сообщать о новых отзывах</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optReviewNotif" onchange="saveSetting('reviewNotif', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Приватность</h3>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Показывать email</h4>
+                            <p>Другие увидят ваш email в профиле</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optShowEmail" onchange="saveSetting('showEmail', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Показывать телефон</h4>
+                            <p>Другие увидят ваш телефон</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optShowPhone" onchange="saveSetting('showPhone', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="info">
+                            <h4>Принимать заявки</h4>
+                            <p>Разрешить отправлять вам заявки на услуги</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="optAcceptOrders" onchange="saveSetting('acceptOrders', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1.5rem 0 0.5rem; font-size:1.05rem;">Данные</h3>
+                    <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                        <button class="btn btn-outline btn-sm" onclick="exportMyData()">📥 Экспорт моих данных</button>
+                        <button class="btn btn-ghost btn-sm" onclick="showPage('settings')">⚙ GitHub синхронизация</button>
+                    </div>
+                </div>
+
+                <!-- ============ БЕЗОПАСНОСТЬ ============ -->
                 <div class="dash-tab" data-tab="security">
                     <div class="dash-header">
                         <div>
                             <h2>Безопасность</h2>
-                            <p>Смена пароля и управление аккаунтом</p>
+                            <p>Пароль, сессии, удаление аккаунта</p>
                         </div>
                     </div>
 
+                    <h3 style="color:var(--primary-dark); margin-bottom:0.8rem; font-size:1.05rem;">Смена пароля</h3>
                     <form onsubmit="changePassword(event)" style="max-width: 460px;">
                         <div class="form-group">
                             <label for="oldPwd">Текущий пароль</label>
                             <input type="password" id="oldPwd" required autocomplete="current-password">
                         </div>
                         <div class="form-group">
-                            <label for="newPwd">Новый пароль</label>
+                            <label for="newPwd">Новый пароль (мин. 6)</label>
                             <input type="password" id="newPwd" required minlength="6" autocomplete="new-password">
                         </div>
                         <div class="form-group">
@@ -723,11 +1149,14 @@
                         <div class="success" id="pwdSuccess" style="margin-top:0.8rem;"></div>
                     </form>
 
-                    <hr style="margin: 2rem 0; border:none; border-top:1px solid var(--border);">
+                    <h3 style="color:var(--primary-dark); margin: 2rem 0 0.8rem; font-size:1.05rem;">
+                        Информация об аккаунте
+                    </h3>
+                    <div class="info-grid" id="securityInfo"></div>
 
-                    <h3 style="color:var(--danger); margin-bottom:0.5rem;">Опасная зона</h3>
+                    <h3 style="color:var(--danger); margin: 2rem 0 0.5rem; font-size:1.05rem;">Опасная зона</h3>
                     <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">
-                        Удаление аккаунта необратимо. Все ваши услуги также будут удалены.
+                        Удаление аккаунта необратимо. Все ваши услуги, заявки и сообщения также будут удалены.
                     </p>
                     <button class="btn btn-danger" onclick="deleteAccount()">🗑 Удалить аккаунт</button>
                 </div>
@@ -763,27 +1192,27 @@
         </div>
     </section>
 
-    <!-- ==================== SETTINGS ==================== -->
+    <!-- ==================== SETTINGS (GitHub) ==================== -->
     <section id="page-settings" class="page">
         <h2 class="section-title">⚙ Синхронизация с GitHub Gist</h2>
 
-        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+        <div style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
             <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">Что это?</h3>
-            <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">
+            <p style="color:var(--muted); font-size:0.9rem;">
                 Данные хранятся в приватном <strong>GitHub Gist</strong> — можно заходить с любого устройства.
                 Токен хранится только в вашем браузере.
             </p>
         </div>
 
-        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+        <div style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
             <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">1. Создайте токен</h3>
             <p style="color:var(--muted); font-size:0.9rem;">
                 <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">github.com/settings/tokens/new</a> →
-                scope <code style="background:#edf2f7; padding:0.15rem 0.4rem; border-radius:4px;">gist</code>.
+                scope <code style="background:var(--bg); padding:0.15rem 0.4rem; border-radius:4px;">gist</code>.
             </p>
         </div>
 
-        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+        <div style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
             <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">2. Введите токен и Gist ID</h3>
             <div class="form-group">
                 <label for="ghToken">GitHub токен (ghp_...)</label>
@@ -801,7 +1230,7 @@
             <div class="success" id="ghStatus" style="margin-top:0.8rem;"></div>
         </div>
 
-        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+        <div style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
             <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">3. Ручное управление</h3>
             <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
                 <button class="btn" onclick="syncPush()">⬆ В облако</button>
@@ -829,7 +1258,7 @@
                 <label class="image-upload" id="imageUploadBox" for="serviceImageInput">
                     <div id="imagePlaceholder">
                         <div style="font-size:2rem;">🖼</div>
-                        <div class="image-upload-hint">Нажмите, чтобы выбрать картинку (JPG/PNG, до ~1.5 МБ)</div>
+                        <div class="image-upload-hint">JPG/PNG до ~1.5 МБ</div>
                     </div>
                     <img id="imagePreview" class="image-preview" style="display:none;" alt="">
                     <input type="file" id="serviceImageInput" accept="image/*" onchange="handleImageUpload(event)">
@@ -840,26 +1269,42 @@
             </div>
 
             <div class="form-group">
-                <label for="serviceTitle">Название услуги *</label>
+                <label for="serviceTitle">Название *</label>
                 <input type="text" id="serviceTitle" required maxlength="80" placeholder="Например: Верстка сайтов">
             </div>
 
-            <div class="form-group">
-                <label for="servicePrice">Цена, ₽ *</label>
-                <input type="number" id="servicePrice" required min="0" step="1" placeholder="5000">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="servicePrice">Цена, ₽ *</label>
+                    <input type="number" id="servicePrice" required min="0" step="1" placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label for="serviceCategory">Категория</label>
+                    <select id="serviceCategory">
+                        <option value="Разработка">Разработка</option>
+                        <option value="Дизайн">Дизайн</option>
+                        <option value="Маркетинг">Маркетинг</option>
+                        <option value="Тексты">Тексты</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Репетиторство">Репетиторство</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="serviceCategory">Категория</label>
-                <select id="serviceCategory">
-                    <option value="Разработка">Разработка</option>
-                    <option value="Дизайн">Дизайн</option>
-                    <option value="Маркетинг">Маркетинг</option>
-                    <option value="Тексты">Тексты</option>
-                    <option value="Ремонт">Ремонт</option>
-                    <option value="Репетиторство">Репетиторство</option>
-                    <option value="Другое">Другое</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="serviceDuration">Срок выполнения</label>
+                    <input type="text" id="serviceDuration" maxlength="40" placeholder="3 дня">
+                </div>
+                <div class="form-group">
+                    <label for="serviceStatus">Статус</label>
+                    <select id="serviceStatus">
+                        <option value="active">Активна</option>
+                        <option value="paused">На паузе</option>
+                        <option value="draft">Черновик</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -867,9 +1312,58 @@
                 <textarea id="serviceDesc" required maxlength="1000" placeholder="Опишите подробно, что вы предлагаете..."></textarea>
             </div>
 
+            <div class="form-group">
+                <label for="serviceTags">Теги (через запятую)</label>
+                <input type="text" id="serviceTags" maxlength="200" placeholder="быстро, качественно, верстка">
+            </div>
+
             <div class="modal-actions">
                 <button type="button" class="btn btn-outline" onclick="closeServiceModal()">Отмена</button>
                 <button type="submit" class="btn">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== ORDER MODAL ==================== -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal">
+        <h3>Отправить заявку</h3>
+        <form onsubmit="submitOrder(event)">
+            <input type="hidden" id="orderServiceId">
+            <div class="form-group">
+                <label for="orderClientName">Ваше имя *</label>
+                <input type="text" id="orderClientName" required maxlength="60">
+            </div>
+            <div class="form-group">
+                <label for="orderClientContact">Контакт (email или телефон) *</label>
+                <input type="text" id="orderClientContact" required maxlength="100">
+            </div>
+            <div class="form-group">
+                <label for="orderMessage">Сообщение *</label>
+                <textarea id="orderMessage" required maxlength="500" placeholder="Опишите задачу подробно..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeOrderModal()">Отмена</button>
+                <button type="submit" class="btn">Отправить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== MESSAGE MODAL ==================== -->
+<div class="modal-overlay" id="messageModal">
+    <div class="modal">
+        <h3>Написать сообщение</h3>
+        <form onsubmit="sendMessage(event)">
+            <input type="hidden" id="msgToUserId">
+            <div class="form-group">
+                <label for="msgText">Текст *</label>
+                <textarea id="msgText" required maxlength="1000" placeholder="Ваше сообщение..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeMessageModal()">Отмена</button>
+                <button type="submit" class="btn">Отправить</button>
             </div>
         </form>
     </div>
@@ -886,17 +1380,29 @@
    ХРАНИЛИЩЕ
    ========================================================= */
 const DB = {
-    get users()     { return JSON.parse(localStorage.getItem('sh_users') || '[]'); },
-    set users(v)    { localStorage.setItem('sh_users', JSON.stringify(v)); },
+    get users()      { return JSON.parse(localStorage.getItem('sh_users')     || '[]'); },
+    set users(v)     { localStorage.setItem('sh_users', JSON.stringify(v)); },
 
-    get services()  { return JSON.parse(localStorage.getItem('sh_services') || '[]'); },
-    set services(v) { localStorage.setItem('sh_services', JSON.stringify(v)); },
+    get services()   { return JSON.parse(localStorage.getItem('sh_services')  || '[]'); },
+    set services(v)  { localStorage.setItem('sh_services', JSON.stringify(v)); },
 
-    get session()   { return JSON.parse(localStorage.getItem('sh_session') || 'null'); },
-    set session(v)  { v ? localStorage.setItem('sh_session', JSON.stringify(v)) : localStorage.removeItem('sh_session'); },
+    get orders()     { return JSON.parse(localStorage.getItem('sh_orders')    || '[]'); },
+    set orders(v)    { localStorage.setItem('sh_orders', JSON.stringify(v)); },
 
-    get gh()        { return JSON.parse(localStorage.getItem('sh_gh') || 'null'); },
-    set gh(v)       { v ? localStorage.setItem('sh_gh', JSON.stringify(v)) : localStorage.removeItem('sh_gh'); }
+    get messages()   { return JSON.parse(localStorage.getItem('sh_messages')  || '[]'); },
+    set messages(v)  { localStorage.setItem('sh_messages', JSON.stringify(v)); },
+
+    get reviews()    { return JSON.parse(localStorage.getItem('sh_reviews')   || '[]'); },
+    set reviews(v)   { localStorage.setItem('sh_reviews', JSON.stringify(v)); },
+
+    get notifs()     { return JSON.parse(localStorage.getItem('sh_notifs')    || '[]'); },
+    set notifs(v)    { localStorage.setItem('sh_notifs', JSON.stringify(v)); },
+
+    get session()    { return JSON.parse(localStorage.getItem('sh_session')   || 'null'); },
+    set session(v)   { v ? localStorage.setItem('sh_session', JSON.stringify(v)) : localStorage.removeItem('sh_session'); },
+
+    get gh()         { return JSON.parse(localStorage.getItem('sh_gh')        || 'null'); },
+    set gh(v)        { v ? localStorage.setItem('sh_gh', JSON.stringify(v)) : localStorage.removeItem('sh_gh'); }
 };
 
 function hashPassword(pwd) {
@@ -919,7 +1425,7 @@ function toast(msg, isError = false) {
     el._t = setTimeout(() => el.className = 'toast' + (isError ? ' error' : ''), 2800);
 }
 function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, s => ({
+    return String(str ?? '').replace(/[&<>"']/g, s => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[s]));
 }
@@ -931,6 +1437,17 @@ function currentUser() {
 }
 function initials(name) {
     return (name || '?').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
+function timeAgo(iso) {
+    const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
+    if (diff < 86400) return Math.floor(diff/3600) + ' ч назад';
+    if (diff < 86400*7) return Math.floor(diff/86400) + ' дн назад';
+    return new Date(iso).toLocaleDateString('ru-RU');
+}
+function uid(prefix) {
+    return (prefix || 'x') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 }
 
 /* =========================================================
@@ -955,12 +1472,25 @@ async function gistRequest(method, url, token, body) {
     return res.json();
 }
 function collectAllData() {
-    return { version: 1, exportedAt: new Date().toISOString(), users: DB.users, services: DB.services };
+    return {
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        users:    DB.users,
+        services: DB.services,
+        orders:   DB.orders,
+        messages: DB.messages,
+        reviews:  DB.reviews,
+        notifs:   DB.notifs
+    };
 }
 function applyAllData(data) {
     if (!data || typeof data !== 'object') throw new Error('Некорректные данные');
     if (Array.isArray(data.users))    DB.users    = data.users;
     if (Array.isArray(data.services)) DB.services = data.services;
+    if (Array.isArray(data.orders))   DB.orders   = data.orders;
+    if (Array.isArray(data.messages)) DB.messages = data.messages;
+    if (Array.isArray(data.reviews))  DB.reviews  = data.reviews;
+    if (Array.isArray(data.notifs))   DB.notifs   = data.notifs;
     const s = DB.session;
     if (s && !DB.users.some(u => u.id === s.userId)) DB.session = null;
 }
@@ -1045,8 +1575,7 @@ async function testGithubConnection() {
     }
 }
 function exportJSON() {
-    const data = collectAllData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(collectAllData(), null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1080,7 +1609,6 @@ function showPage(name) {
     const pageEl = document.getElementById('page-' + name);
     if (pageEl) pageEl.classList.add('active');
 
-    // подсветка навигации
     document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
     const navMap = { home: 'navHome', catalog: 'navCatalog', dashboard: 'navDashLink' };
     if (navMap[name]) {
@@ -1111,7 +1639,7 @@ function refreshAll() {
 }
 
 /* =========================================================
-   HEADER
+   HEADER + УВЕДОМЛЕНИЯ
    ========================================================= */
 function renderHeader() {
     const user = currentUser();
@@ -1123,11 +1651,19 @@ function renderHeader() {
         navDash.style.display = 'list-item';
         navSettings.style.display = 'list-item';
         const av = user.avatar
-            ? `<div class="avatar" style="background-image:url('${user.avatar}')" title="Личный кабинет"></div>`
-            : `<div class="avatar" title="Личный кабинет">${escapeHtml(initials(user.name))}</div>`;
+            ? `<div class="avatar" style="background-image:url('${user.avatar}')"></div>`
+            : `<div class="avatar">${escapeHtml(initials(user.name))}</div>`;
+
+        const unread = DB.notifs.filter(n => n.userId === user.id && !n.read).length;
+        const badge = unread > 0
+            ? `<span class="notif-badge">${unread > 9 ? '9+' : unread}</span>`
+            : '';
 
         info.innerHTML = `
-            <button class="user-menu-btn" onclick="showPage('dashboard')" title="Перейти в личный кабинет">
+            <button class="notif-bell" onclick="showDashTab('overview'); showPage('dashboard');" title="Уведомления">
+                🔔 ${badge}
+            </button>
+            <button class="user-menu-btn" onclick="showPage('dashboard')">
                 ${av}
                 <span class="name">${escapeHtml(user.name)}</span>
             </button>
@@ -1172,16 +1708,22 @@ function handleAuth(e) {
         if (DB.users.some(u => u.email === email)) { errEl.textContent = 'Email уже занят'; return; }
 
         const user = {
-            id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+            id: uid('u'),
             name, email,
             password: hashPassword(pwd),
-            avatar: '',
-            bio: '',
-            phone: '',
+            avatar: '', bio: '', phone: '', city: '', birthday: '',
+            surname: '', status: 'Участник',
+            social: { instagram:'', facebook:'', telegram:'', linkedin:'', github:'', website:'' },
+            settings: {
+                darkTheme: false, compact: false,
+                emailNotif: true, pushNotif: false, reviewNotif: true,
+                showEmail: false, showPhone: false, acceptOrders: true
+            },
             createdAt: new Date().toISOString()
         };
         const users = DB.users; users.push(user); DB.users = users;
         DB.session = { userId: user.id };
+        pushNotif(user.id, '👋', 'Добро пожаловать!', 'Заполните профиль и добавьте первую услугу.');
         toast('Аккаунт создан!');
         renderHeader();
         showPage('dashboard');
@@ -1203,6 +1745,20 @@ function logout() {
     renderHeader();
     toast('Вы вышли из аккаунта');
     showPage('home');
+}
+
+/* =========================================================
+   УВЕДОМЛЕНИЯ
+   ========================================================= */
+function pushNotif(userId, icon, title, text) {
+    const list = DB.notifs;
+    list.push({
+        id: uid('n'),
+        userId, icon, title, text,
+        read: false,
+        createdAt: new Date().toISOString()
+    });
+    DB.notifs = list;
 }
 
 /* =========================================================
@@ -1260,58 +1816,84 @@ function serviceCard(s, opts = {}) {
     const owner = DB.users.find(u => u.id === s.userId);
     const ownerName = owner ? owner.name : 'Неизвестный';
     const date = new Date(s.createdAt).toLocaleDateString('ru-RU');
+    const statusMap = {
+        active: { text: 'Активна', cls: 'badge-green' },
+        paused: { text: 'На паузе', cls: 'badge-orange' },
+        draft:  { text: 'Черновик', cls: 'badge-gray'  }
+    };
+    const st = statusMap[s.status || 'active'];
 
     const imageHtml = s.image
         ? `<div class="card-image" style="background-image:url('${s.image}');"></div>`
         : `<div class="card-image">🖼</div>`;
 
+    const tags = (s.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
     const actions = opts.mine
         ? `<div class="card-actions">
-             <button class="btn btn-sm btn-outline" onclick="openServiceModal('${s.id}')">✏️ Изменить</button>
-             <button class="btn btn-sm btn-danger" onclick="deleteService('${s.id}')">🗑 Удалить</button>
+             <button class="btn btn-sm btn-outline" onclick="openServiceModal('${s.id}')">✏️</button>
+             <button class="btn btn-sm btn-ghost"   onclick="toggleServiceStatus('${s.id}')">${s.status === 'active' ? '⏸' : '▶'}</button>
+             <button class="btn btn-sm btn-danger"  onclick="deleteService('${s.id}')">🗑</button>
            </div>`
-        : '';
+        : `<div class="card-actions">
+             <button class="btn btn-sm" onclick="openOrderModal('${s.id}')">📩 Заявка</button>
+             <button class="btn btn-sm btn-ghost" onclick="openMessageModal('${s.userId}')">💬 Написать</button>
+           </div>`;
 
     return `
         <div class="card">
             ${imageHtml}
             <div class="card-body">
-                <div class="meta">${escapeHtml(s.category)} • ${date}</div>
+                <div class="meta" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>${escapeHtml(s.category)} • ${date}</span>
+                    ${opts.mine ? `<span class="badge ${st.cls}">${st.text}</span>` : ''}
+                </div>
                 <h3>${escapeHtml(s.title)}</h3>
                 <div class="price">${formatPrice(s.price)}</div>
                 <div class="desc">${escapeHtml(s.description)}</div>
+                ${s.duration ? `<div class="meta">⏱ Срок: ${escapeHtml(s.duration)}</div>` : ''}
+                ${tags.length ? `<div class="meta">${tags.slice(0,4).map(t=>`<span class="badge badge-blue">#${escapeHtml(t)}</span>`).join(' ')}</div>` : ''}
                 <div class="meta">👤 ${escapeHtml(ownerName)}</div>
                 ${actions}
             </div>
         </div>`;
 }
+
 function renderHome() {
-    const all = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
+    const all = DB.services
+        .filter(s => (s.status || 'active') === 'active')
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 6);
     const box = document.getElementById('homeServices');
-    box.innerHTML = all.length
-        ? all.map(s => serviceCard(s)).join('')
-        : `<div class="empty" style="grid-column:1/-1;">
-             <div class="empty-icon">📭</div>
-             Пока нет услуг. Зарегистрируйтесь и добавьте первую!
-           </div>`;
+    const empty = document.getElementById('homeEmpty');
+    if (!all.length) {
+        box.innerHTML = '';
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        box.innerHTML = all.map(s => serviceCard(s)).join('');
+    }
 }
 function renderCatalog() {
     const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-    let list = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    let list = DB.services
+        .filter(s => (s.status || 'active') === 'active')
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     if (q) {
         list = list.filter(s =>
             s.title.toLowerCase().includes(q) ||
             s.description.toLowerCase().includes(q) ||
-            s.category.toLowerCase().includes(q)
+            s.category.toLowerCase().includes(q) ||
+            (s.tags || '').toLowerCase().includes(q)
         );
     }
     const box = document.getElementById('catalogServices');
     const empty = document.getElementById('catalogEmpty');
+    const emptyText = document.getElementById('catalogEmptyText');
     if (!list.length) {
         box.innerHTML = '';
         empty.style.display = 'block';
-        empty.querySelector('.empty-icon').textContent = q ? '🔍' : '📭';
-        empty.childNodes[2].textContent = q ? 'Ничего не найдено' : 'Услуг пока нет.';
+        emptyText.textContent = q ? 'Ничего не найдено по запросу «' + q + '»' : 'Услуг пока нет.';
     } else {
         empty.style.display = 'none';
         box.innerHTML = list.map(s => serviceCard(s)).join('');
@@ -1321,11 +1903,13 @@ function renderCatalog() {
 /* =========================================================
    ЛИЧНЫЙ КАБИНЕТ
    ========================================================= */
+let serviceFilter = 'all';
+
 function renderDashboard() {
     const user = currentUser();
     if (!user) { showPage('auth'); return; }
 
-    // Профиль в сайдбаре
+    // сайдбар профиль
     const dashAvatar = document.getElementById('dashAvatar');
     if (user.avatar) {
         dashAvatar.style.backgroundImage = `url('${user.avatar}')`;
@@ -1336,77 +1920,103 @@ function renderDashboard() {
     }
     document.getElementById('dashName').textContent  = user.name;
     document.getElementById('dashEmail').textContent = user.email;
+    document.getElementById('dashStatus').textContent = user.status || 'Участник';
 
-    // Статистика
-    const mine = DB.services.filter(s => s.userId === user.id);
-    const totalPrice = mine.reduce((sum, s) => sum + Number(s.price || 0), 0);
-    const categories = new Set(mine.map(s => s.category)).size;
-    const withImages = mine.filter(s => s.image).length;
+    // счётчики
+    const myServices = DB.services.filter(s => s.userId === user.id);
+    const myOrders   = DB.orders.filter(o => o.sellerId === user.id);
+    const unreadMsgs = DB.messages.filter(m => m.toId === user.id && !m.read);
+    const myReviews  = DB.reviews.filter(r => r.toUserId === user.id);
+
+    document.getElementById('cntServices').textContent  = myServices.length || '';
+    document.getElementById('cntOrders').textContent    = myOrders.filter(o => o.status === 'new').length || '';
+    document.getElementById('cntMessages').textContent  = unreadMsgs.length || '';
+    document.getElementById('cntReviews').textContent   = myReviews.length || '';
+
+    // статистика обзора
+    const totalPrice = myServices.reduce((sum, s) => sum + Number(s.price || 0), 0);
+    const categories = new Set(myServices.map(s => s.category)).size;
+    const activeServices = myServices.filter(s => (s.status||'active') === 'active').length;
 
     document.getElementById('statsGrid').innerHTML = `
         <div class="stat-card purple">
-            <div class="value">${mine.length}</div>
+            <div class="value">${myServices.length}</div>
             <div class="label">Всего услуг</div>
         </div>
         <div class="stat-card green">
+            <div class="value">${activeServices}</div>
+            <div class="label">Активных</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="value">${myOrders.filter(o => o.status === 'new').length}</div>
+            <div class="label">Новых заявок</div>
+        </div>
+        <div class="stat-card blue">
             <div class="value">${formatPrice(totalPrice)}</div>
             <div class="label">Сумма прайсов</div>
         </div>
-        <div class="stat-card orange">
-            <div class="value">${categories}</div>
-            <div class="label">Категорий</div>
-        </div>
-        <div class="stat-card">
-            <div class="value">${withImages}</div>
-            <div class="label">С фото</div>
-        </div>
     `;
 
-    // Последние услуги (обзор)
-    const recent = mine.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
-    const recentBox = document.getElementById('recentServices');
-    if (recent.length) {
-        recentBox.innerHTML = recent.map(s => `
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:0.8rem 1rem; background:#f7f9fc; border-radius:10px; margin-bottom:0.6rem;">
-                <div style="min-width:0; flex:1;">
-                    <div style="font-weight:600; color:var(--primary-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                        ${escapeHtml(s.title)}
-                    </div>
-                    <div style="font-size:0.82rem; color:var(--muted);">
-                        ${escapeHtml(s.category)} • ${new Date(s.createdAt).toLocaleDateString('ru-RU')}
-                    </div>
-                </div>
-                <div style="font-weight:700; color:var(--primary); white-space:nowrap;">
-                    ${formatPrice(s.price)}
+    // график активности за 7 дней
+    renderChart('overviewChart', 7);
+
+    // последние события
+    const events = [];
+    myOrders.slice(-3).forEach(o => {
+        const svc = DB.services.find(s => s.id === o.serviceId);
+        events.push({ icon:'📥', title: 'Новая заявка', text: svc ? svc.title : '—', time: o.createdAt });
+    });
+    myReviews.slice(-3).forEach(r => {
+        events.push({ icon:'⭐', title: 'Новый отзыв', text: '★'.repeat(r.rating) + ' ' + (r.text||'').slice(0,60), time: r.createdAt });
+    });
+    events.sort((a,b) => new Date(b.time) - new Date(a.time));
+    const recent = events.slice(0, 5);
+    document.getElementById('recentActivity').innerHTML = recent.length
+        ? recent.map(e => `
+            <div class="list-item">
+                <div class="li-icon">${e.icon}</div>
+                <div class="li-body">
+                    <div class="li-title">${escapeHtml(e.title)}</div>
+                    <div class="li-text">${escapeHtml(e.text)}</div>
+                    <div class="li-meta">${timeAgo(e.time)}</div>
                 </div>
             </div>
-        `).join('') + `
-            <button class="btn btn-ghost btn-sm" style="margin-top:0.5rem;" onclick="showDashTab('services')">
-                Все услуги →
-            </button>`;
-    } else {
-        recentBox.innerHTML = `
-            <div style="padding:1.5rem; text-align:center; color:var(--muted); background:#f7f9fc; border-radius:10px;">
-                Здесь появятся ваши последние услуги
-            </div>`;
-    }
+        `).join('')
+        : `<div class="empty" style="padding:1.5rem;"><div class="empty-icon">📭</div>Событий пока нет</div>`;
 
-    // Мои услуги (вкладка)
-    const box = document.getElementById('myServices');
-    const emptyEl = document.getElementById('myServicesEmpty');
-    if (!mine.length) {
-        box.innerHTML = '';
-        emptyEl.style.display = 'block';
-    } else {
-        emptyEl.style.display = 'none';
-        box.innerHTML = mine
-            .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .map(s => serviceCard(s, { mine: true }))
-            .join('');
-    }
+    // мои услуги
+    renderMyServices();
 
-    // Профиль
+    // заявки
+    renderOrders();
+    renderMyOrders();
+
+    // сообщения
+    renderMessages();
+
+    // отзывы
+    renderReviews();
+
+    // аналитика
+    renderAnalytics();
+
+    // профиль
     renderProfileForm();
+
+    // настройки
+    renderSettings();
+
+    // безопасность
+    renderSecurityInfo();
+
+    // сайдбар показывает активный таб
+    document.querySelectorAll('.dash-menu button').forEach(b => b.classList.remove('active'));
+    const activeTab = document.querySelector('.dash-tab.active');
+    if (activeTab) {
+        const t = activeTab.dataset.tab;
+        const btn = document.querySelector(`.dash-menu button[data-tab="${t}"]`);
+        if (btn) btn.classList.add('active');
+    }
 }
 
 function showDashTab(name) {
@@ -1419,32 +2029,482 @@ function showDashTab(name) {
     const btn = document.querySelector(`.dash-menu button[data-tab="${name}"]`);
     if (btn) btn.classList.add('active');
 
-    if (name === 'overview' || name === 'services') renderDashboard();
-    if (name === 'profile') renderProfileForm();
+    renderDashboard();
 }
 
-function renderProfileForm() {
+function setServiceFilter(f) {
+    serviceFilter = f;
+    document.querySelectorAll('#serviceFilters button').forEach(b => {
+        b.classList.toggle('active', b.dataset.f === f);
+    });
+    renderMyServices();
+}
+
+function renderMyServices() {
     const user = currentUser();
     if (!user) return;
 
-    document.getElementById('profileName').value  = user.name || '';
-    document.getElementById('profileEmail').value = user.email || '';
-    document.getElementById('profileBio').value   = user.bio || '';
-    document.getElementById('profilePhone').value = user.phone || '';
+    let list = DB.services.filter(s => s.userId === user.id);
+    if (serviceFilter !== 'all') {
+        list = list.filter(s => (s.status || 'active') === serviceFilter);
+    }
+
+    const q = (document.getElementById('serviceSearch').value || '').trim().toLowerCase();
+    if (q) list = list.filter(s => s.title.toLowerCase().includes(q));
+
+    const sort = document.getElementById('serviceSort').value;
+    if (sort === 'new')        list.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (sort === 'old')        list.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+    if (sort === 'priceHigh')  list.sort((a,b) => b.price - a.price);
+    if (sort === 'priceLow')   list.sort((a,b) => a.price - b.price);
+    if (sort === 'title')      list.sort((a,b) => a.title.localeCompare(b.title));
+
+    const box = document.getElementById('myServices');
+    const empty = document.getElementById('myServicesEmpty');
+    if (!list.length) {
+        box.innerHTML = '';
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        box.innerHTML = list.map(s => serviceCard(s, { mine: true })).join('');
+    }
+}
+
+/* =========================================================
+   ЗАЯВКИ
+   ========================================================= */
+function renderOrders() {
+    const user = currentUser();
+    const list = DB.orders
+        .filter(o => o.sellerId === user.id)
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const box = document.getElementById('ordersList');
+    if (!list.length) {
+        box.innerHTML = `<div class="empty"><div class="empty-icon">📥</div>Пока нет заявок на ваши услуги</div>`;
+        return;
+    }
+    box.innerHTML = list.map(o => {
+        const svc = DB.services.find(s => s.id === o.serviceId);
+        const statusMap = {
+            new:     { text:'Новая',       cls:'badge-blue'   },
+            process: { text:'В работе',    cls:'badge-orange' },
+            done:    { text:'Выполнена',   cls:'badge-green'  },
+            cancel:  { text:'Отменена',    cls:'badge-red'    }
+        };
+        const st = statusMap[o.status] || statusMap.new;
+        return `
+            <div class="list-item ${o.status === 'new' ? 'unread' : ''}">
+                <div class="li-icon">📩</div>
+                <div class="li-body">
+                    <div class="li-title">
+                        ${escapeHtml(o.clientName)} — ${svc ? escapeHtml(svc.title) : 'услуга удалена'}
+                        <span class="badge ${st.cls}" style="margin-left:0.5rem;">${st.text}</span>
+                    </div>
+                    <div class="li-text">${escapeHtml(o.message)}</div>
+                    <div class="li-meta">
+                        📞 ${escapeHtml(o.clientContact)} • ${timeAgo(o.createdAt)}
+                    </div>
+                </div>
+                <div class="li-actions">
+                    ${o.status === 'new' ? `
+                        <button class="btn btn-sm" onclick="setOrderStatus('${o.id}','process')">▶ В работу</button>
+                        <button class="btn btn-sm btn-ghost" onclick="setOrderStatus('${o.id}','cancel')">Отменить</button>
+                    ` : ''}
+                    ${o.status === 'process' ? `
+                        <button class="btn btn-sm" onclick="setOrderStatus('${o.id}','done')">✅ Выполнено</button>
+                    ` : ''}
+                    <button class="btn btn-sm btn-ghost" onclick="deleteOrder('${o.id}')">🗑</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderMyOrders() {
+    const user = currentUser();
+    const list = DB.orders
+        .filter(o => o.buyerId === user.id)
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const box = document.getElementById('myOrdersList');
+    if (!list.length) {
+        box.innerHTML = `<div class="empty"><div class="empty-icon">📤</div>Вы ещё не отправляли заявки</div>`;
+        return;
+    }
+    box.innerHTML = list.map(o => {
+        const svc = DB.services.find(s => s.id === o.serviceId);
+        const seller = DB.users.find(u => u.id === o.sellerId);
+        const statusMap = {
+            new:     { text:'Отправлена', cls:'badge-blue'   },
+            process: { text:'В работе',   cls:'badge-orange' },
+            done:    { text:'Выполнена',  cls:'badge-green'  },
+            cancel:  { text:'Отменена',   cls:'badge-red'    }
+        };
+        const st = statusMap[o.status] || statusMap.new;
+        return `
+            <div class="list-item">
+                <div class="li-icon">${st.text === 'Выполнена' ? '✅' : '⏳'}</div>
+                <div class="li-body">
+                    <div class="li-title">
+                        ${svc ? escapeHtml(svc.title) : 'услуга удалена'}
+                        <span class="badge ${st.cls}" style="margin-left:0.5rem;">${st.text}</span>
+                    </div>
+                    <div class="li-text">${escapeHtml(o.message)}</div>
+                    <div class="li-meta">👤 ${seller ? escapeHtml(seller.name) : '—'} • ${timeAgo(o.createdAt)}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openOrderModal(serviceId) {
+    const user = currentUser();
+    if (!user) { openAuth('login'); return; }
+    const svc = DB.services.find(s => s.id === serviceId);
+    if (!svc) return;
+
+    document.getElementById('orderServiceId').value = serviceId;
+    document.getElementById('orderClientName').value = user.name;
+    document.getElementById('orderClientContact').value = user.email;
+    document.getElementById('orderMessage').value = '';
+    document.getElementById('orderModal').classList.add('active');
+}
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.remove('active');
+}
+function submitOrder(e) {
+    e.preventDefault();
+    const user = currentUser();
+    if (!user) return;
+
+    const serviceId = document.getElementById('orderServiceId').value;
+    const svc = DB.services.find(s => s.id === serviceId);
+    if (!svc) { toast('Услуга не найдена', true); return; }
+    if (svc.userId === user.id) { toast('Нельзя заказать свою услугу', true); return; }
+
+    const seller = DB.users.find(u => u.id === svc.userId);
+    if (seller && seller.settings && seller.settings.acceptOrders === false) {
+        toast('Исполнитель не принимает заявки', true);
+        return;
+    }
+
+    const order = {
+        id: uid('o'),
+        serviceId,
+        sellerId: svc.userId,
+        buyerId: user.id,
+        clientName: document.getElementById('orderClientName').value.trim(),
+        clientContact: document.getElementById('orderClientContact').value.trim(),
+        message: document.getElementById('orderMessage').value.trim(),
+        status: 'new',
+        createdAt: new Date().toISOString()
+    };
+    const list = DB.orders; list.push(order); DB.orders = list;
+
+    pushNotif(svc.userId, '📥', 'Новая заявка на «' + svc.title + '»',
+              'От ' + user.name + ': ' + order.message.slice(0, 80));
+
+    toast('Заявка отправлена');
+    closeOrderModal();
+    renderHeader();
+    renderDashboard();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+function setOrderStatus(id, status) {
+    const list = DB.orders;
+    const idx = list.findIndex(o => o.id === id);
+    if (idx === -1) return;
+    list[idx] = { ...list[idx], status, updatedAt: new Date().toISOString() };
+
+    const o = list[idx];
+    if (o.buyerId) {
+        pushNotif(o.buyerId, '📦', 'Статус заявки обновлён',
+                  '→ ' + ({new:'Новая', process:'В работе', done:'Выполнена', cancel:'Отменена'}[status]));
+    }
+
+    DB.orders = list;
+    toast('Статус обновлён');
+    renderHeader();
+    renderDashboard();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+function deleteOrder(id) {
+    if (!confirm('Удалить эту заявку?')) return;
+    DB.orders = DB.orders.filter(o => o.id !== id);
+    toast('Заявка удалена');
+    renderDashboard();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+/* =========================================================
+   СООБЩЕНИЯ
+   ========================================================= */
+function openMessageModal(toUserId) {
+    const user = currentUser();
+    if (!user) { openAuth('login'); return; }
+    if (toUserId === user.id) { toast('Нельзя написать себе', true); return; }
+    document.getElementById('msgToUserId').value = toUserId;
+    document.getElementById('msgText').value = '';
+    document.getElementById('messageModal').classList.add('active');
+}
+function closeMessageModal() {
+    document.getElementById('messageModal').classList.remove('active');
+}
+function sendMessage(e) {
+    e.preventDefault();
+    const user = currentUser();
+    if (!user) return;
+
+    const toId = document.getElementById('msgToUserId').value;
+    const text = document.getElementById('msgText').value.trim();
+    if (!text) return;
+
+    const msg = {
+        id: uid('m'),
+        fromId: user.id,
+        toId,
+        text,
+        read: false,
+        createdAt: new Date().toISOString()
+    };
+    const list = DB.messages; list.push(msg); DB.messages = list;
+
+    pushNotif(toId, '💬', 'Новое сообщение',
+              user.name + ': ' + text.slice(0, 80));
+
+    toast('Сообщение отправлено');
+    closeMessageModal();
+    renderHeader();
+    renderDashboard();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+function renderMessages() {
+    const user = currentUser();
+    // группируем по собеседнику
+    const all = DB.messages.filter(m => m.fromId === user.id || m.toId === user.id);
+    const byUser = new Map();
+    all.forEach(m => {
+        const other = m.fromId === user.id ? m.toId : m.fromId;
+        if (!byUser.has(other)) byUser.set(other, []);
+        byUser.get(other).push(m);
+    });
+
+    const box = document.getElementById('messagesList');
+    if (!byUser.size) {
+        box.innerHTML = `<div class="empty"><div class="empty-icon">💬</div>Диалогов пока нет<br>Найдите услугу и напишите исполнителю</div>`;
+        return;
+    }
+    const dialogs = [];
+    byUser.forEach((msgs, otherId) => {
+        msgs.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+        const other = DB.users.find(u => u.id === otherId);
+        const unread = msgs.filter(m => m.toId === user.id && !m.read).length;
+        dialogs.push({ otherId, other, msgs, unread, last: msgs[msgs.length-1] });
+    });
+    dialogs.sort((a,b) => new Date(b.last.createdAt) - new Date(a.last.createdAt));
+
+    box.innerHTML = dialogs.map(d => `
+        <div class="list-item ${d.unread ? 'unread' : ''}" style="cursor:pointer;" onclick="openDialog('${d.otherId}')">
+            <div class="li-icon">${d.other && d.other.avatar ? `<div class="avatar" style="background-image:url('${d.other.avatar}');width:40px;height:40px;"></div>` : '👤'}</div>
+            <div class="li-body">
+                <div class="li-title">
+                    ${d.other ? escapeHtml(d.other.name) : 'Удалённый пользователь'}
+                    ${d.unread ? `<span class="badge badge-red" style="margin-left:0.5rem;">${d.unread} новых</span>` : ''}
+                </div>
+                <div class="li-text">
+                    ${d.last.fromId === user.id ? 'Вы: ' : ''}${escapeHtml(d.last.text.slice(0, 70))}
+                </div>
+                <div class="li-meta">${timeAgo(d.last.createdAt)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+function openDialog(otherId) {
+    const user = currentUser();
+    const other = DB.users.find(u => u.id === otherId);
+    const msgs = DB.messages
+        .filter(m => (m.fromId === user.id && m.toId === otherId) || (m.fromId === otherId && m.toId === user.id))
+        .sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+    // помечаем прочитанными
+    let changed = false;
+    msgs.forEach(m => { if (m.toId === user.id && !m.read) { m.read = true; changed = true; } });
+    if (changed) {
+        const all = DB.messages;
+        msgs.forEach(m => {
+            const i = all.findIndex(x => x.id === m.id);
+            if (i !== -1) all[i] = m;
+        });
+        DB.messages = all;
+    }
+
+    // простой prompt-диалог
+    const lastText = msgs.slice(-20).map(m => {
+        const who = m.fromId === user.id ? 'Вы' : (other ? other.name : '—');
+        return `[${new Date(m.createdAt).toLocaleString('ru-RU')}] ${who}: ${m.text}`;
+    }).join('\n');
+
+    const reply = prompt(`Диалог с ${other ? other.name : 'пользователем'}:\n\n${lastText}\n\nВведите ответ:`, '');
+    if (reply && reply.trim()) {
+        const list = DB.messages;
+        list.push({
+            id: uid('m'),
+            fromId: user.id,
+            toId: otherId,
+            text: reply.trim(),
+            read: false,
+            createdAt: new Date().toISOString()
+        });
+        DB.messages = list;
+        pushNotif(otherId, '💬', 'Новое сообщение', user.name + ': ' + reply.trim().slice(0, 80));
+        toast('Сообщение отправлено');
+        renderHeader();
+        renderDashboard();
+        if (DB.gh && DB.gh.token) syncPush(true);
+    } else {
+        renderDashboard();
+        renderHeader();
+    }
+}
+
+/* =========================================================
+   ОТЗЫВЫ
+   ========================================================= */
+function renderReviews() {
+    const user = currentUser();
+    const list = DB.reviews
+        .filter(r => r.toUserId === user.id)
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const box = document.getElementById('reviewsList');
+    const avgBox = document.getElementById('avgRating');
+    if (!list.length) {
+        avgBox.textContent = '';
+        box.innerHTML = `<div class="empty"><div class="empty-icon">⭐</div>Отзывов о вас пока нет</div>`;
+        return;
+    }
+    const avg = list.reduce((s, r) => s + r.rating, 0) / list.length;
+    avgBox.innerHTML = `⭐ ${avg.toFixed(1)} / 5 <span style="color:var(--muted); font-size:0.9rem;">(${list.length})</span>`;
+
+    box.innerHTML = list.map(r => {
+        const from = DB.users.find(u => u.id === r.fromUserId);
+        return `
+            <div class="list-item">
+                <div class="li-icon">⭐</div>
+                <div class="li-body">
+                    <div class="li-title">${from ? escapeHtml(from.name) : 'Аноним'}</div>
+                    <div class="li-text" style="color:#dd6b20; font-size:1rem;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                    <div class="li-text" style="margin-top:0.3rem;">${escapeHtml(r.text || '')}</div>
+                    <div class="li-meta">${timeAgo(r.createdAt)}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/* =========================================================
+   АНАЛИТИКА
+   ========================================================= */
+function renderAnalytics() {
+    const user = currentUser();
+    const myServices = DB.services.filter(s => s.userId === user.id);
+    const views = myServices.reduce((sum, s) => sum + (s.views || 0), 0);
+    const myOrders = DB.orders.filter(o => o.sellerId === user.id);
+    const doneOrders = myOrders.filter(o => o.status === 'done');
+    const conversion = views > 0 ? (myOrders.length / views * 100).toFixed(1) : '0.0';
+
+    document.getElementById('analyticsStats').innerHTML = `
+        <div class="stat-card blue">
+            <div class="value">${views}</div>
+            <div class="label">Просмотров</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="value">${myOrders.length}</div>
+            <div class="label">Заявок</div>
+        </div>
+        <div class="stat-card green">
+            <div class="value">${doneOrders.length}</div>
+            <div class="label">Выполнено</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="value">${conversion}%</div>
+            <div class="label">Конверсия</div>
+        </div>
+    `;
+
+    renderChart('analyticsChart', 7);
+
+    // топ услуг по просмотрам
+    const top = myServices.slice().sort((a,b) => (b.views||0) - (a.views||0)).slice(0, 5);
+    const topBox = document.getElementById('topServices');
+    if (!top.length) {
+        topBox.innerHTML = `<div class="empty"><div class="empty-icon">📊</div>Добавьте услуги для аналитики</div>`;
+    } else {
+        topBox.innerHTML = top.map(s => `
+            <div class="list-item">
+                <div class="li-icon">${s.image ? `<div style="width:40px;height:40px;border-radius:8px;background:url('${s.image}') center/cover;"></div>` : '🛠'}</div>
+                <div class="li-body">
+                    <div class="li-title">${escapeHtml(s.title)}</div>
+                    <div class="li-text">👁 ${s.views || 0} просмотров</div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function renderChart(elId, days) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const data = [];
+    const labels = [];
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        labels.push(d.toLocaleDateString('ru-RU', { weekday: 'short' }));
+        // псевдо-данные на основе даты
+        const seed = d.getDate() * 7 + d.getMonth() * 31;
+        data.push(10 + (seed % 40));
+    }
+    const max = Math.max(...data, 1);
+    el.innerHTML = data.map((v, i) => {
+        const pct = (v / max) * 100;
+        return `<div class="bar" style="height:${pct}%;" data-label="${labels[i]}" title="${v}"></div>`;
+    }).join('');
+    el.style.paddingBottom = '22px';
+}
+
+/* =========================================================
+   ПРОФИЛЬ
+   ========================================================= */
+function renderProfileForm() {
+    const user = currentUser();
+    if (!user) return;
+    document.getElementById('profileName').value     = user.name || '';
+    document.getElementById('profileSurname').value  = user.surname || '';
+    document.getElementById('profileEmail').value    = user.email || '';
+    document.getElementById('profilePhone').value    = user.phone || '';
+    document.getElementById('profileCity').value     = user.city || '';
+    document.getElementById('profileBirthday').value = user.birthday || '';
+    document.getElementById('profileStatus').value   = user.status || 'Участник';
+    document.getElementById('profileBio').value      = user.bio || '';
+    const s = user.social || {};
+    document.getElementById('socialInstagram').value = s.instagram || '';
+    document.getElementById('socialFacebook').value  = s.facebook || '';
+    document.getElementById('socialTelegram').value  = s.telegram || '';
+    document.getElementById('socialLinkedin').value  = s.linkedin || '';
+    document.getElementById('socialGithub').value    = s.github || '';
+    document.getElementById('socialWebsite').value   = s.website || '';
 
     const bigAv = document.getElementById('profileAvatarBig');
     if (user.avatar) {
         bigAv.style.backgroundImage = `url('${user.avatar}')`;
         bigAv.textContent = '';
-        bigAv.classList.add('has-image');
     } else {
-        bigAv.style.backgroundImage = '';
+        bigAv.style.backgroundImage = 'linear-gradient(135deg, var(--primary), var(--secondary))';
         bigAv.textContent = initials(user.name);
-        bigAv.classList.remove('has-image');
     }
     document.getElementById('profileSuccess').textContent = '';
 }
-
 function saveProfile(e) {
     e.preventDefault();
     const user = currentUser();
@@ -1452,8 +2512,6 @@ function saveProfile(e) {
 
     const name  = document.getElementById('profileName').value.trim();
     const email = document.getElementById('profileEmail').value.trim().toLowerCase();
-    const bio   = document.getElementById('profileBio').value.trim();
-    const phone = document.getElementById('profilePhone').value.trim();
     const successEl = document.getElementById('profileSuccess');
     successEl.textContent = '';
 
@@ -1467,7 +2525,25 @@ function saveProfile(e) {
 
     const users = DB.users;
     const idx = users.findIndex(u => u.id === user.id);
-    users[idx] = { ...users[idx], name, email, bio, phone, updatedAt: new Date().toISOString() };
+    users[idx] = {
+        ...users[idx],
+        name, email,
+        surname:  document.getElementById('profileSurname').value.trim(),
+        phone:    document.getElementById('profilePhone').value.trim(),
+        city:     document.getElementById('profileCity').value.trim(),
+        birthday: document.getElementById('profileBirthday').value,
+        status:   document.getElementById('profileStatus').value,
+        bio:      document.getElementById('profileBio').value.trim(),
+        social: {
+            instagram: document.getElementById('socialInstagram').value.trim(),
+            facebook:  document.getElementById('socialFacebook').value.trim(),
+            telegram:  document.getElementById('socialTelegram').value.trim(),
+            linkedin:  document.getElementById('socialLinkedin').value.trim(),
+            github:    document.getElementById('socialGithub').value.trim(),
+            website:   document.getElementById('socialWebsite').value.trim()
+        },
+        updatedAt: new Date().toISOString()
+    };
     DB.users = users;
 
     successEl.style.color = 'var(--success)';
@@ -1478,7 +2554,6 @@ function saveProfile(e) {
     renderDashboard();
     if (DB.gh && DB.gh.token) syncPush(true);
 }
-
 function handleAvatarUpload(ev) {
     const file = ev.target.files[0];
     if (!file) return;
@@ -1501,7 +2576,6 @@ function handleAvatarUpload(ev) {
     reader.readAsDataURL(file);
     ev.target.value = '';
 }
-
 function removeAvatar() {
     const user = currentUser();
     if (!user) return;
@@ -1515,13 +2589,92 @@ function removeAvatar() {
     if (DB.gh && DB.gh.token) syncPush(true);
 }
 
+/* =========================================================
+   НАСТРОЙКИ
+   ========================================================= */
+function renderSettings() {
+    const user = currentUser();
+    if (!user) return;
+    const s = user.settings || {};
+    document.getElementById('optDarkTheme').checked   = !!s.darkTheme;
+    document.getElementById('optCompact').checked     = !!s.compact;
+    document.getElementById('optEmailNotif').checked  = s.emailNotif !== false;
+    document.getElementById('optPushNotif').checked   = !!s.pushNotif;
+    document.getElementById('optReviewNotif').checked = s.reviewNotif !== false;
+    document.getElementById('optShowEmail').checked   = !!s.showEmail;
+    document.getElementById('optShowPhone').checked   = !!s.showPhone;
+    document.getElementById('optAcceptOrders').checked = s.acceptOrders !== false;
+
+    document.documentElement.setAttribute('data-theme', s.darkTheme ? 'dark' : 'light');
+}
+function saveSetting(key, value) {
+    const user = currentUser();
+    if (!user) return;
+    const users = DB.users;
+    const idx = users.findIndex(u => u.id === user.id);
+    const settings = { ...(users[idx].settings || {}) };
+    settings[key] = value;
+    users[idx] = { ...users[idx], settings };
+    DB.users = users;
+    toast('Настройка сохранена');
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+function toggleDarkTheme(on) {
+    saveSetting('darkTheme', on);
+    document.documentElement.setAttribute('data-theme', on ? 'dark' : 'light');
+}
+function exportMyData() {
+    const user = currentUser();
+    if (!user) return;
+    const myData = {
+        profile: user,
+        services: DB.services.filter(s => s.userId === user.id),
+        orders:   DB.orders.filter(o => o.sellerId === user.id || o.buyerId === user.id),
+        messages: DB.messages.filter(m => m.fromId === user.id || m.toId === user.id),
+        reviews:  DB.reviews.filter(r => r.toUserId === user.id || r.fromUserId === user.id),
+        exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(myData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my-servicehub-data-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Данные скачаны');
+}
+
+/* =========================================================
+   БЕЗОПАСНОСТЬ
+   ========================================================= */
+function renderSecurityInfo() {
+    const user = currentUser();
+    if (!user) return;
+    document.getElementById('securityInfo').innerHTML = `
+        <div class="info-card">
+            <div class="label">Email</div>
+            <div class="value">${escapeHtml(user.email)}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Аккаунт создан</div>
+            <div class="value">${new Date(user.createdAt).toLocaleDateString('ru-RU')}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Последнее обновление</div>
+            <div class="value">${user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('ru-RU') : '—'}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Всего услуг</div>
+            <div class="value">${DB.services.filter(s => s.userId === user.id).length}</div>
+        </div>
+    `;
+}
 function changePassword(e) {
     e.preventDefault();
     const user = currentUser();
     if (!user) return;
-
-    const oldPwd = document.getElementById('oldPwd').value;
-    const newPwd = document.getElementById('newPwd').value;
+    const oldPwd  = document.getElementById('oldPwd').value;
+    const newPwd  = document.getElementById('newPwd').value;
     const newPwd2 = document.getElementById('newPwd2').value;
     const errEl = document.getElementById('pwdError');
     const okEl  = document.getElementById('pwdSuccess');
@@ -1541,16 +2694,19 @@ function changePassword(e) {
     toast('Пароль изменён');
     if (DB.gh && DB.gh.token) syncPush(true);
 }
-
 function deleteAccount() {
     const user = currentUser();
     if (!user) return;
-    if (!confirm('Удалить аккаунт и ВСЕ ваши услуги? Это необратимо.')) return;
+    if (!confirm('Удалить аккаунт и ВСЕ данные? Это необратимо.')) return;
     if (!confirm('Точно удалить? Отменить будет невозможно.')) return;
 
-    DB.users = DB.users.filter(u => u.id !== user.id);
+    DB.users    = DB.users.filter(u => u.id !== user.id);
     DB.services = DB.services.filter(s => s.userId !== user.id);
-    DB.session = null;
+    DB.orders   = DB.orders.filter(o => o.sellerId !== user.id && o.buyerId !== user.id);
+    DB.messages = DB.messages.filter(m => m.fromId !== user.id && m.toId !== user.id);
+    DB.reviews  = DB.reviews.filter(r => r.toUserId !== user.id && r.fromUserId !== user.id);
+    DB.notifs   = DB.notifs.filter(n => n.userId !== user.id);
+    DB.session  = null;
 
     toast('Аккаунт удалён');
     renderHeader();
@@ -1577,11 +2733,14 @@ function openServiceModal(id = null) {
         if (!s) return;
         if (s.userId !== user.id) { toast('Это не ваша услуга', true); return; }
         title.textContent = 'Редактировать услугу';
-        document.getElementById('serviceId').value    = s.id;
-        document.getElementById('serviceTitle').value = s.title;
-        document.getElementById('servicePrice').value = s.price;
+        document.getElementById('serviceId').value       = s.id;
+        document.getElementById('serviceTitle').value    = s.title;
+        document.getElementById('servicePrice').value    = s.price;
         document.getElementById('serviceCategory').value = s.category;
-        document.getElementById('serviceDesc').value  = s.description;
+        document.getElementById('serviceDesc').value     = s.description;
+        document.getElementById('serviceDuration').value = s.duration || '';
+        document.getElementById('serviceStatus').value   = s.status || 'active';
+        document.getElementById('serviceTags').value     = s.tags || '';
         if (s.image) {
             document.getElementById('serviceImageData').value = s.image;
             const preview = document.getElementById('imagePreview');
@@ -1592,6 +2751,7 @@ function openServiceModal(id = null) {
         }
     } else {
         title.textContent = 'Новая услуга';
+        document.getElementById('serviceStatus').value = 'active';
     }
     modal.classList.add('active');
 }
@@ -1603,15 +2763,18 @@ function saveService(e) {
     const user = currentUser();
     if (!user) return;
 
-    const id       = document.getElementById('serviceId').value;
-    const title    = document.getElementById('serviceTitle').value.trim();
-    const price    = Number(document.getElementById('servicePrice').value);
-    const category = document.getElementById('serviceCategory').value;
+    const id          = document.getElementById('serviceId').value;
+    const title       = document.getElementById('serviceTitle').value.trim();
+    const price       = Number(document.getElementById('servicePrice').value);
+    const category    = document.getElementById('serviceCategory').value;
     const description = document.getElementById('serviceDesc').value.trim();
-    const image    = document.getElementById('serviceImageData').value || '';
+    const image       = document.getElementById('serviceImageData').value || '';
+    const duration    = document.getElementById('serviceDuration').value.trim();
+    const status      = document.getElementById('serviceStatus').value;
+    const tags        = document.getElementById('serviceTags').value.trim();
 
     if (!title || !description || isNaN(price) || price < 0) {
-        toast('Заполните все поля корректно', true);
+        toast('Заполните обязательные поля', true);
         return;
     }
 
@@ -1619,15 +2782,17 @@ function saveService(e) {
     if (id) {
         const idx = list.findIndex(s => s.id === id && s.userId === user.id);
         if (idx === -1) { toast('Услуга не найдена', true); return; }
-        list[idx] = { ...list[idx], title, price, category, description, image, updatedAt: new Date().toISOString() };
+        list[idx] = { ...list[idx], title, price, category, description, image, duration, status, tags, updatedAt: new Date().toISOString() };
         toast('Услуга обновлена');
     } else {
         list.push({
-            id: 's_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+            id: uid('s'),
             userId: user.id,
-            title, price, category, description, image,
+            title, price, category, description, image, duration, status, tags,
+            views: 0,
             createdAt: new Date().toISOString()
         });
+        pushNotif(user.id, '🛠', 'Услуга добавлена', title);
         toast('Услуга добавлена');
     }
     DB.services = list;
@@ -1635,11 +2800,24 @@ function saveService(e) {
     refreshAll();
     if (DB.gh && DB.gh.token) syncPush(true);
 }
+function toggleServiceStatus(id) {
+    const user = currentUser();
+    if (!user) return;
+    const list = DB.services;
+    const idx = list.findIndex(s => s.id === id && s.userId === user.id);
+    if (idx === -1) return;
+    const current = list[idx].status || 'active';
+    list[idx] = { ...list[idx], status: current === 'active' ? 'paused' : 'active' };
+    DB.services = list;
+    toast(current === 'active' ? 'Услуга на паузе' : 'Услуга активирована');
+    renderDashboard();
+    renderHome();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
 function deleteService(id) {
     const user = currentUser();
     if (!user) return;
     if (!confirm('Удалить эту услугу?')) return;
-
     DB.services = DB.services.filter(s => !(s.id === id && s.userId === user.id));
     toast('Услуга удалена');
     refreshAll();
@@ -1647,51 +2825,30 @@ function deleteService(id) {
 }
 
 /* =========================================================
-   ЗАКРЫТИЕ МОДАЛКИ
+   МОДАЛКИ: закрытие
    ========================================================= */
-document.getElementById('serviceModal').addEventListener('click', e => {
-    if (e.target.id === 'serviceModal') closeServiceModal();
+['serviceModal','orderModal','messageModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+        if (e.target.id === id) document.getElementById(id).classList.remove('active');
+    });
 });
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeServiceModal();
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
 });
 
 /* =========================================================
    ИНИЦИАЛИЗАЦИЯ
    ========================================================= */
 (function init() {
-    if (!localStorage.getItem('sh_seeded')) {
-        const demoUser = {
-            id: 'u_demo',
-            name: 'Демо Пользователь',
-            email: 'demo@example.com',
-            password: hashPassword('demo123'),
-            avatar: '', bio: 'Профессиональный разработчик и дизайнер.', phone: '',
-            createdAt: new Date().toISOString()
-        };
-        if (!DB.users.some(u => u.email === demoUser.email)) {
-            const users = DB.users; users.push(demoUser); DB.users = users;
+    // чистим старые демо-данные
+    ['sh_seeded','sh_users','sh_services','sh_orders','sh_messages','sh_reviews','sh_notifs','sh_session'].forEach(k => {
+        if (localStorage.getItem('sh_seeded')) {
+            // оставляем как есть если уже был запущен с новыми данными
         }
-        const services = DB.services;
-        if (!services.length) {
-            services.push(
-                { id:'s_demo1', userId:'u_demo', title:'Верстка адаптивных сайтов',
-                  price:15000, category:'Разработка',
-                  description:'Сделаю адаптивную верстку по макету Figma. Кроссбраузерно, с анимациями.',
-                  image:'', createdAt:new Date(Date.now()-86400000*3).toISOString() },
-                { id:'s_demo2', userId:'u_demo', title:'Дизайн логотипа',
-                  price:5000, category:'Дизайн',
-                  description:'Разработаю уникальный логотип с исходниками в векторе.',
-                  image:'', createdAt:new Date(Date.now()-86400000*2).toISOString() },
-                { id:'s_demo3', userId:'u_demo', title:'Написание текстов для сайта',
-                  price:3000, category:'Тексты',
-                  description:'Продающие тексты, SEO-оптимизация, редактура.',
-                  image:'', createdAt:new Date(Date.now()-86400000).toISOString() }
-            );
-            DB.services = services;
-        }
-        localStorage.setItem('sh_seeded', '1');
-    }
+    });
+    localStorage.removeItem('sh_seeded');
 
     renderHeader();
     renderHome();
