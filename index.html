@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="ServiceHub — платформа услуг с картинками, описанием и облачным хранением">
+<meta name="description" content="ServiceHub — платформа услуг с личным кабинетом">
 <title>ServiceHub — платформа услуг</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,8 +19,10 @@
         --border: #e2e8f0;
         --danger: #e53e3e;
         --success: #38a169;
+        --warning: #dd6b20;
         --radius: 12px;
         --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
     }
 
     body {
@@ -33,11 +35,13 @@
         flex-direction: column;
     }
 
-    /* HEADER */
+    /* =====================================================
+       HEADER
+       ===================================================== */
     header {
         background: rgba(255,255,255,0.98);
         backdrop-filter: blur(10px);
-        padding: 1rem 2rem;
+        padding: 0.8rem 2rem;
         box-shadow: var(--shadow);
         position: sticky;
         top: 0;
@@ -48,46 +52,73 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
-    .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); cursor: pointer; }
-    nav ul { list-style: none; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+    .logo {
+        font-size: 1.4rem; font-weight: 700;
+        color: var(--primary-dark); cursor: pointer;
+        display: flex; align-items: center; gap: 0.4rem;
+    }
+    nav ul {
+        list-style: none; display: flex;
+        gap: 1.5rem; flex-wrap: wrap; align-items: center;
+    }
     nav a, nav button.link {
-        text-decoration: none; color: var(--muted); font-weight: 500;
-        background: none; border: none; cursor: pointer; font-size: 1rem;
+        text-decoration: none; color: var(--muted);
+        font-weight: 500; background: none; border: none;
+        cursor: pointer; font-size: 1rem;
         transition: color 0.2s; font-family: inherit;
     }
     nav a:hover, nav button.link:hover { color: var(--primary); }
+    nav a.active { color: var(--primary); font-weight: 600; }
 
-    .user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.95rem; }
+    .user-info { display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; }
     .user-info .name { font-weight: 600; color: var(--primary-dark); }
     .avatar {
-        width: 36px; height: 36px; border-radius: 50%;
+        width: 38px; height: 38px; border-radius: 50%;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #fff; display: flex; align-items: center; justify-content: center;
         font-weight: 700; font-size: 0.9rem;
+        cursor: pointer; transition: transform 0.2s;
+        background-size: cover; background-position: center;
+        border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
+    .avatar:hover { transform: scale(1.08); }
 
-    .sync-status {
-        font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
-        background: #edf2f7; color: var(--muted);
+    .user-menu-btn {
+        display: flex; align-items: center; gap: 0.6rem;
+        background: none; border: none; cursor: pointer;
+        font-family: inherit; padding: 0.3rem;
+        border-radius: 50px; transition: background 0.2s;
     }
-    .sync-status.online { background: #c6f6d5; color: #22543d; }
-    .sync-status.offline { background: #fed7d7; color: #742a2a; }
-    .sync-status.syncing { background: #feebc8; color: #7b341e; }
+    .user-menu-btn:hover { background: #f0f4ff; }
 
-    /* MAIN */
+    /* =====================================================
+       MAIN
+       ===================================================== */
     main { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem 1rem; }
-    .page { display: none; animation: fadeIn 0.4s ease; }
+    .page { display: none; animation: fadeIn 0.35s ease; }
     .page.active { display: block; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 
+    /* HERO */
     .hero {
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #fff; border-radius: var(--radius);
         padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;
+        position: relative; overflow: hidden;
     }
+    .hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 40%);
+        pointer-events: none;
+    }
+    .hero h2, .hero p, .hero .hero-actions { position: relative; }
     .hero h2 { font-size: 2.2rem; margin-bottom: 0.8rem; }
-    .hero p { font-size: 1.1rem; opacity: 0.95; max-width: 600px; margin: 0 auto; }
+    .hero p { font-size: 1.1rem; opacity: 0.95; max-width: 620px; margin: 0 auto; }
 
     .section-title {
         font-size: 1.6rem; color: var(--primary-dark); margin-bottom: 1.2rem;
@@ -95,49 +126,57 @@
         flex-wrap: wrap; gap: 1rem;
     }
 
-    /* BUTTONS */
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
     .btn {
-        display: inline-block; padding: 0.7rem 1.5rem;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+        padding: 0.7rem 1.5rem;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #fff; text-decoration: none; border-radius: 50px;
         font-weight: 600; border: none; cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
         box-shadow: 0 4px 15px rgba(102,126,234,0.35);
         font-family: inherit; font-size: 0.95rem;
+        white-space: nowrap;
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(102,126,234,0.5); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+    .btn-lg { padding: 0.9rem 2rem; font-size: 1rem; }
     .btn-outline {
         background: transparent; color: var(--primary);
         border: 2px solid var(--primary); box-shadow: none;
     }
     .btn-outline:hover { background: var(--primary); color: #fff; }
     .btn-danger { background: var(--danger); box-shadow: 0 4px 15px rgba(229,62,62,0.35); }
-    .btn-ghost { background: transparent; color: var(--muted); box-shadow: none; border: 1px solid var(--border); }
+    .btn-ghost {
+        background: transparent; color: var(--muted);
+        box-shadow: none; border: 1px solid var(--border);
+    }
     .btn-ghost:hover { background: var(--bg); color: var(--primary-dark); }
+    .btn-block { width: 100%; }
 
-    /* CARDS */
+    /* =====================================================
+       CARDS / GRID
+       ===================================================== */
     .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
     }
-
     .card {
         background: var(--card); border-radius: var(--radius);
         box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
         display: flex; flex-direction: column; overflow: hidden;
     }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
-
+    .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
     .card-image {
         width: 100%; aspect-ratio: 16/10;
         background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
         background-size: cover; background-position: center;
         display: flex; align-items: center; justify-content: center;
         color: #a0aec0; font-size: 2.5rem;
-        position: relative;
     }
     .card-body { padding: 1.2rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
     .card h3 { color: var(--primary-dark); font-size: 1.15rem; }
@@ -154,8 +193,11 @@
         text-align: center; padding: 3rem 1rem; color: var(--muted);
         background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
     }
+    .empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
 
-    /* FORM */
+    /* =====================================================
+       FORM
+       ===================================================== */
     .form-container {
         max-width: 460px; margin: 2rem auto; background: var(--card);
         padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow);
@@ -179,8 +221,8 @@
 
     .form-footer { margin-top: 1.2rem; text-align: center; font-size: 0.9rem; color: var(--muted); }
     .form-footer button.link {
-        background: none; border: none; color: var(--primary); cursor: pointer;
-        font-weight: 600; font-family: inherit; font-size: 0.9rem;
+        background: none; border: none; color: var(--primary);
+        cursor: pointer; font-weight: 600; font-family: inherit; font-size: 0.9rem;
     }
     .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
     .success { color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; }
@@ -190,7 +232,7 @@
         border: 2px dashed var(--border); border-radius: 10px;
         padding: 1.2rem; text-align: center; cursor: pointer;
         transition: border-color 0.2s, background 0.2s;
-        background: #fafbfd;
+        background: #fafbfd; display: block;
     }
     .image-upload:hover { border-color: var(--primary); background: #f0f4ff; }
     .image-upload.has-image { padding: 0; border-style: solid; overflow: hidden; }
@@ -201,9 +243,11 @@
     .image-upload-hint { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
     .image-upload input[type=file] { display: none; }
 
-    /* MODAL */
+    /* =====================================================
+       МОДАЛКА
+       ===================================================== */
     .modal-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+        position: fixed; inset: 0; background: rgba(0,0,0,0.55);
         display: none; align-items: center; justify-content: center;
         z-index: 200; padding: 1rem; overflow-y: auto;
     }
@@ -213,23 +257,222 @@
         max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto;
         animation: slideUp 0.3s ease;
     }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
     .modal h3 { color: var(--primary-dark); margin-bottom: 1rem; }
-    .modal-actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.5rem; }
-
-    /* SETTINGS */
-    .settings-block {
-        background: var(--card); border-radius: var(--radius);
-        padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow);
-    }
-    .settings-block h3 { color: var(--primary-dark); margin-bottom: 0.8rem; }
-    .settings-block p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
-    .settings-block code {
-        background: #edf2f7; padding: 0.15rem 0.4rem;
-        border-radius: 4px; font-size: 0.85rem;
+    .modal-actions {
+        display: flex; gap: 0.8rem; justify-content: flex-end;
+        margin-top: 1.5rem; flex-wrap: wrap;
     }
 
-    /* TOAST */
+    /* =====================================================
+       ЛИЧНЫЙ КАБИНЕТ
+       ===================================================== */
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    /* Сайдбар */
+    .dash-sidebar {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+
+    .dash-profile {
+        padding: 1.5rem 1.2rem;
+        text-align: center;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+    }
+    .dash-avatar {
+        width: 84px; height: 84px; border-radius: 50%;
+        margin: 0 auto 0.8rem;
+        background: rgba(255,255,255,0.25);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; font-weight: 700;
+        border: 3px solid rgba(255,255,255,0.6);
+        background-size: cover; background-position: center;
+        cursor: pointer; position: relative;
+        transition: transform 0.2s;
+    }
+    .dash-avatar:hover { transform: scale(1.05); }
+    .dash-avatar::after {
+        content: '📷';
+        position: absolute;
+        bottom: -4px; right: -4px;
+        background: #fff; color: var(--primary);
+        width: 28px; height: 28px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .dash-profile h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
+    .dash-profile p { font-size: 0.8rem; opacity: 0.9; word-break: break-all; }
+
+    .dash-menu {
+        list-style: none;
+        padding: 0.6rem 0;
+    }
+    .dash-menu li { margin: 0; }
+    .dash-menu button {
+        width: 100%;
+        background: none;
+        border: none;
+        text-align: left;
+        padding: 0.75rem 1.4rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        transition: background 0.2s, color 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .dash-menu button:hover { background: #f0f4ff; color: var(--primary); }
+    .dash-menu button.active {
+        background: #f0f4ff;
+        color: var(--primary);
+        font-weight: 600;
+        border-left-color: var(--primary);
+    }
+    .dash-menu .icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+    /* Основная область */
+    .dash-content {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.8rem;
+        min-height: 400px;
+    }
+
+    .dash-tab { display: none; animation: fadeIn 0.3s ease; }
+    .dash-tab.active { display: block; }
+
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .dash-header h2 {
+        color: var(--primary-dark);
+        font-size: 1.4rem;
+    }
+    .dash-header p { color: var(--muted); font-size: 0.9rem; }
+
+    /* Статистика */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #f7f9fc, #eef2f9);
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+        border-left: 4px solid var(--primary);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        line-height: 1.1;
+    }
+    .stat-card .label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.2rem;
+    }
+    .stat-card.green  { border-left-color: var(--success); }
+    .stat-card.orange { border-left-color: var(--warning); }
+    .stat-card.purple { border-left-color: var(--secondary); }
+
+    /* Профиль-форма */
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 1.8rem;
+    }
+    .profile-avatar-block {
+        text-align: center;
+    }
+    .profile-avatar-big {
+        width: 160px; height: 160px; border-radius: 50%;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3.5rem; font-weight: 700;
+        background-size: cover; background-position: center;
+        box-shadow: 0 8px 24px rgba(102,126,234,0.35);
+        border: 4px solid #fff;
+    }
+    .profile-avatar-big.has-image { color: transparent; }
+
+    /* Адаптив */
+    @media (max-width: 900px) {
+        .dashboard-layout {
+            grid-template-columns: 1fr;
+        }
+        .dash-sidebar {
+            position: static;
+        }
+        .dash-menu {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.3rem;
+            gap: 0.2rem;
+        }
+        .dash-menu li { flex: 1 1 auto; }
+        .dash-menu button {
+            border-left: none;
+            border-bottom: 3px solid transparent;
+            justify-content: center;
+            padding: 0.6rem 0.9rem;
+            border-radius: 8px;
+        }
+        .dash-menu button.active {
+            border-left: none;
+            border-bottom-color: var(--primary);
+            background: #f0f4ff;
+        }
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* =====================================================
+       SYNC STATUS / TOAST / FOOTER
+       ===================================================== */
+    .sync-status {
+        font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+        background: #edf2f7; color: var(--muted);
+    }
+    .sync-status.online  { background: #c6f6d5; color: #22543d; }
+    .sync-status.offline { background: #fed7d7; color: #742a2a; }
+    .sync-status.syncing { background: #feebc8; color: #7b341e; }
+
     .toast {
         position: fixed; bottom: 2rem; right: 2rem;
         background: var(--success); color: #fff;
@@ -247,53 +490,62 @@
         padding: 1.5rem; font-size: 0.9rem; margin-top: 2rem;
     }
 
-    /* RESPONSIVE */
+    /* =====================================================
+       ГЛОБАЛЬНЫЙ АДАПТИВ
+       ===================================================== */
     @media (max-width: 768px) {
-        header { padding: 1rem; }
-        .logo { font-size: 1.2rem; }
-        nav ul { gap: 1rem; width: 100%; justify-content: center; }
+        header { padding: 0.8rem 1rem; }
+        .logo { font-size: 1.15rem; }
+        nav ul { gap: 0.9rem; width: 100%; justify-content: center; }
+        nav a, nav button.link { font-size: 0.9rem; }
         .hero { padding: 2rem 1.2rem; }
         .hero h2 { font-size: 1.6rem; }
         .hero p { font-size: 1rem; }
-        main { padding: 1.5rem 0.8rem; }
+        main { padding: 1.2rem 0.8rem; }
         .section-title { font-size: 1.3rem; }
         .form-container { padding: 1.5rem; margin: 1rem auto; }
-        .modal { padding: 1.5rem; }
+        .modal { padding: 1.3rem; }
         .toast { left: 1rem; right: 1rem; bottom: 1rem; text-align: center; max-width: none; }
         .user-info .name { display: none; }
+        .dash-content { padding: 1.2rem; }
+        .dash-header h2 { font-size: 1.2rem; }
     }
     @media (max-width: 480px) {
         .grid { grid-template-columns: 1fr; }
-        .hero h2 { font-size: 1.4rem; }
+        .hero h2 { font-size: 1.35rem; }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+        .stat-card .value { font-size: 1.5rem; }
+        .profile-avatar-big { width: 120px; height: 120px; font-size: 2.5rem; }
     }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ==================== HEADER ==================== -->
 <header>
     <div class="logo" onclick="showPage('home')">🚀 ServiceHub</div>
     <nav>
         <ul>
-            <li><a href="#" onclick="showPage('home'); return false;">Главная</a></li>
-            <li><a href="#" onclick="showPage('catalog'); return false;">Услуги</a></li>
+            <li><a href="#" id="navHome" onclick="showPage('home'); return false;">Главная</a></li>
+            <li><a href="#" id="navCatalog" onclick="showPage('catalog'); return false;">Услуги</a></li>
             <li id="navDashboard" style="display:none;">
-                <a href="#" onclick="showPage('dashboard'); return false;">Личный кабинет</a>
+                <a href="#" id="navDashLink" onclick="showPage('dashboard'); return false;">Личный кабинет</a>
             </li>
-            <li><a href="#" onclick="showPage('settings'); return false;">⚙ Синхронизация</a></li>
+            <li id="navSettings" style="display:none;">
+                <a href="#" onclick="showPage('settings'); return false;">⚙ Синхронизация</a>
+            </li>
         </ul>
     </nav>
     <div class="user-info" id="userInfo"></div>
 </header>
 
 <main>
-    <!-- HOME -->
+    <!-- ==================== HOME ==================== -->
     <section id="page-home" class="page active">
         <div class="hero">
             <h2>Найдите нужную услугу</h2>
             <p>Платформа, где каждый может предложить свои услуги с фото, описанием и ценой. Регистрируйтесь и добавляйте услуги бесплатно.</p>
-            <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <div class="hero-actions" style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
                 <button class="btn" onclick="showPage('catalog')">Смотреть услуги</button>
                 <button class="btn btn-outline" style="color:#fff;border-color:#fff;" onclick="openAuth('register')">Стать исполнителем</button>
             </div>
@@ -302,7 +554,7 @@
         <div class="grid" id="homeServices"></div>
     </section>
 
-    <!-- CATALOG -->
+    <!-- ==================== CATALOG ==================== -->
     <section id="page-catalog" class="page">
         <div class="section-title">
             <h2>Все услуги</h2>
@@ -312,23 +564,179 @@
         </div>
         <div class="grid" id="catalogServices"></div>
         <div id="catalogEmpty" class="empty" style="display:none;">
+            <div class="empty-icon">🔍</div>
             Услуг пока нет. Станьте первым исполнителем!
         </div>
     </section>
 
-    <!-- DASHBOARD -->
+    <!-- ==================== ЛИЧНЫЙ КАБИНЕТ ==================== -->
     <section id="page-dashboard" class="page">
-        <div class="section-title">
-            <h2>Мои услуги</h2>
-            <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
-        </div>
-        <div class="grid" id="myServices"></div>
-        <div id="myServicesEmpty" class="empty" style="display:none;">
-            У вас пока нет услуг. Нажмите «Добавить услугу», чтобы создать первую.
+        <div class="dashboard-layout">
+
+            <!-- Сайдбар -->
+            <aside class="dash-sidebar">
+                <div class="dash-profile">
+                    <div class="dash-avatar" id="dashAvatar" onclick="showDashTab('profile')" title="Изменить аватар"></div>
+                    <h3 id="dashName">—</h3>
+                    <p id="dashEmail">—</p>
+                </div>
+                <ul class="dash-menu">
+                    <li>
+                        <button class="active" data-tab="overview" onclick="showDashTab('overview')">
+                            <span class="icon">📊</span> Обзор
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="services" onclick="showDashTab('services')">
+                            <span class="icon">🛠</span> Мои услуги
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="profile" onclick="showDashTab('profile')">
+                            <span class="icon">👤</span> Профиль
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="security" onclick="showDashTab('security')">
+                            <span class="icon">🔒</span> Безопасность
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="logout()" style="color:var(--danger);">
+                            <span class="icon">🚪</span> Выйти
+                        </button>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Контент -->
+            <div class="dash-content">
+
+                <!-- ОБЗОР -->
+                <div class="dash-tab active" data-tab="overview">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Обзор</h2>
+                            <p>Краткая сводка по вашему аккаунту</p>
+                        </div>
+                        <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
+                    </div>
+
+                    <div class="stats-grid" id="statsGrid"></div>
+
+                    <h3 style="color:var(--primary-dark); margin: 1rem 0 0.8rem; font-size:1.1rem;">
+                        Последние услуги
+                    </h3>
+                    <div id="recentServices"></div>
+                </div>
+
+                <!-- МОИ УСЛУГИ -->
+                <div class="dash-tab" data-tab="services">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Мои услуги</h2>
+                            <p>Управляйте своими предложениями</p>
+                        </div>
+                        <button class="btn" onclick="openServiceModal()">+ Добавить услугу</button>
+                    </div>
+
+                    <div class="grid" id="myServices"></div>
+                    <div id="myServicesEmpty" class="empty" style="display:none;">
+                        <div class="empty-icon">📦</div>
+                        У вас пока нет услуг.<br>
+                        Нажмите «Добавить услугу», чтобы создать первую.
+                    </div>
+                </div>
+
+                <!-- ПРОФИЛЬ -->
+                <div class="dash-tab" data-tab="profile">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Профиль</h2>
+                            <p>Настройте личные данные</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-grid">
+                        <div class="profile-avatar-block">
+                            <div class="profile-avatar-big" id="profileAvatarBig"></div>
+                            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                                📷 Загрузить аватар
+                                <input type="file" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+                            </label>
+                            <div style="margin-top:0.5rem;">
+                                <button class="btn btn-ghost btn-sm" onclick="removeAvatar()">Убрать</button>
+                            </div>
+                        </div>
+
+                        <form onsubmit="saveProfile(event)">
+                            <div class="form-group">
+                                <label for="profileName">Имя *</label>
+                                <input type="text" id="profileName" required maxlength="60">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileEmail">Email *</label>
+                                <input type="email" id="profileEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profileBio">О себе</label>
+                                <textarea id="profileBio" maxlength="300"
+                                          placeholder="Коротко расскажите о себе (до 300 символов)"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="profilePhone">Телефон</label>
+                                <input type="tel" id="profilePhone" maxlength="20" placeholder="+7 (___) ___-__-__">
+                            </div>
+                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                                <button type="submit" class="btn">💾 Сохранить</button>
+                                <button type="button" class="btn btn-ghost" onclick="renderProfileForm()">Отменить</button>
+                            </div>
+                            <div class="success" id="profileSuccess" style="margin-top:0.8rem;"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- БЕЗОПАСНОСТЬ -->
+                <div class="dash-tab" data-tab="security">
+                    <div class="dash-header">
+                        <div>
+                            <h2>Безопасность</h2>
+                            <p>Смена пароля и управление аккаунтом</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="changePassword(event)" style="max-width: 460px;">
+                        <div class="form-group">
+                            <label for="oldPwd">Текущий пароль</label>
+                            <input type="password" id="oldPwd" required autocomplete="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPwd">Новый пароль</label>
+                            <input type="password" id="newPwd" required minlength="6" autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPwd2">Повторите новый пароль</label>
+                            <input type="password" id="newPwd2" required minlength="6" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn">🔒 Сменить пароль</button>
+                        <div class="error" id="pwdError" style="margin-top:0.8rem;"></div>
+                        <div class="success" id="pwdSuccess" style="margin-top:0.8rem;"></div>
+                    </form>
+
+                    <hr style="margin: 2rem 0; border:none; border-top:1px solid var(--border);">
+
+                    <h3 style="color:var(--danger); margin-bottom:0.5rem;">Опасная зона</h3>
+                    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">
+                        Удаление аккаунта необратимо. Все ваши услуги также будут удалены.
+                    </p>
+                    <button class="btn btn-danger" onclick="deleteAccount()">🗑 Удалить аккаунт</button>
+                </div>
+
+            </div>
         </div>
     </section>
 
-    <!-- AUTH -->
+    <!-- ==================== AUTH ==================== -->
     <section id="page-auth" class="page">
         <div class="form-container">
             <h2 id="authTitle">Вход</h2>
@@ -345,7 +753,7 @@
                     <label for="authPassword">Пароль</label>
                     <input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="6" autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;" id="authSubmit">Войти</button>
+                <button type="submit" class="btn btn-block" style="margin-top:0.5rem;" id="authSubmit">Войти</button>
                 <div class="error" id="authError"></div>
             </form>
             <div class="form-footer">
@@ -355,53 +763,49 @@
         </div>
     </section>
 
-    <!-- SETTINGS / SYNC -->
+    <!-- ==================== SETTINGS ==================== -->
     <section id="page-settings" class="page">
         <h2 class="section-title">⚙ Синхронизация с GitHub Gist</h2>
 
-        <div class="settings-block">
-            <h3>Что это?</h3>
-            <p>
-                Все данные (пользователи и услуги) могут храниться в вашем приватном
-                <strong>GitHub Gist</strong>. Это позволит заходить с любого устройства и видеть одни и те же услуги.
-            </p>
-            <p>
-                <strong>Важно:</strong> токен хранится только в вашем браузере (localStorage).
-                Не публикуйте его. Для продакшена используйте серверный бэкенд.
+        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+            <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">Что это?</h3>
+            <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">
+                Данные хранятся в приватном <strong>GitHub Gist</strong> — можно заходить с любого устройства.
+                Токен хранится только в вашем браузере.
             </p>
         </div>
 
-        <div class="settings-block">
-            <h3>1. Создайте GitHub-токен</h3>
-            <p>
-                Зайдите в <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">
-                github.com/settings/tokens/new</a>, выберите scope <code>gist</code>, создайте и скопируйте токен.
+        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+            <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">1. Создайте токен</h3>
+            <p style="color:var(--muted); font-size:0.9rem;">
+                <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">github.com/settings/tokens/new</a> →
+                scope <code style="background:#edf2f7; padding:0.15rem 0.4rem; border-radius:4px;">gist</code>.
             </p>
         </div>
 
-        <div class="settings-block">
-            <h3>2. Введите токен и Gist ID</h3>
+        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+            <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">2. Введите токен и Gist ID</h3>
             <div class="form-group">
                 <label for="ghToken">GitHub токен (ghp_...)</label>
-                <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+                <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
             </div>
             <div class="form-group">
-                <label for="ghGistId">Gist ID (оставьте пустым для создания нового)</label>
-                <input type="text" id="ghGistId" placeholder="например: a1b2c3d4e5f6..." autocomplete="off">
+                <label for="ghGistId">Gist ID (пусто = создать новый)</label>
+                <input type="text" id="ghGistId" placeholder="a1b2c3d4e5f6..." autocomplete="off">
             </div>
             <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                <button class="btn" onclick="saveGithubConfig()">💾 Сохранить настройки</button>
-                <button class="btn btn-outline" onclick="testGithubConnection()">🔌 Проверить связь</button>
+                <button class="btn" onclick="saveGithubConfig()">💾 Сохранить</button>
+                <button class="btn btn-outline" onclick="testGithubConnection()">🔌 Проверить</button>
                 <button class="btn btn-ghost" onclick="clearGithubConfig()">Очистить</button>
             </div>
             <div class="success" id="ghStatus" style="margin-top:0.8rem;"></div>
         </div>
 
-        <div class="settings-block">
-            <h3>3. Ручное управление</h3>
+        <div class="settings-block" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow);">
+            <h3 style="color:var(--primary-dark); margin-bottom:0.8rem;">3. Ручное управление</h3>
             <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                <button class="btn" onclick="syncPush()">⬆ Загрузить в облако</button>
-                <button class="btn btn-outline" onclick="syncPull()">⬇ Загрузить из облака</button>
+                <button class="btn" onclick="syncPush()">⬆ В облако</button>
+                <button class="btn btn-outline" onclick="syncPull()">⬇ Из облака</button>
                 <button class="btn btn-ghost" onclick="exportJSON()">📥 Скачать JSON</button>
                 <label class="btn btn-ghost" style="cursor:pointer;">
                     📤 Загрузить JSON
@@ -412,7 +816,7 @@
     </section>
 </main>
 
-<!-- MODAL: SERVICE -->
+<!-- ==================== SERVICE MODAL ==================== -->
 <div class="modal-overlay" id="serviceModal">
     <div class="modal">
         <h3 id="serviceModalTitle">Новая услуга</h3>
@@ -479,7 +883,7 @@
 
 <script>
 /* =========================================================
-   ХРАНИЛИЩЕ (localStorage + GitHub Gist)
+   ХРАНИЛИЩЕ
    ========================================================= */
 const DB = {
     get users()     { return JSON.parse(localStorage.getItem('sh_users') || '[]'); },
@@ -514,25 +918,23 @@ function toast(msg, isError = false) {
     clearTimeout(el._t);
     el._t = setTimeout(() => el.className = 'toast' + (isError ? ' error' : ''), 2800);
 }
-
 function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, s => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[s]));
 }
-
-function formatPrice(n) {
-    return Number(n || 0).toLocaleString('ru-RU') + ' ₽';
-}
-
+function formatPrice(n) { return Number(n || 0).toLocaleString('ru-RU') + ' ₽'; }
 function currentUser() {
     const s = DB.session;
     if (!s) return null;
     return DB.users.find(u => u.id === s.userId) || null;
 }
+function initials(name) {
+    return (name || '?').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
 
 /* =========================================================
-   GITHUB GIST СИНХРОНИЗАЦИЯ
+   GITHUB GIST
    ========================================================= */
 const GIST_FILENAME = 'servicehub-data.json';
 
@@ -552,45 +954,31 @@ async function gistRequest(method, url, token, body) {
     }
     return res.json();
 }
-
 function collectAllData() {
-    return {
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        users: DB.users,
-        services: DB.services
-    };
+    return { version: 1, exportedAt: new Date().toISOString(), users: DB.users, services: DB.services };
 }
-
 function applyAllData(data) {
     if (!data || typeof data !== 'object') throw new Error('Некорректные данные');
     if (Array.isArray(data.users))    DB.users    = data.users;
     if (Array.isArray(data.services)) DB.services = data.services;
-    // сброс сессии, если текущего пользователя больше нет
     const s = DB.session;
     if (s && !DB.users.some(u => u.id === s.userId)) DB.session = null;
 }
-
-function setSyncStatus(text, cls = '') {
+function setSyncStatus(text) {
     const el = document.getElementById('ghStatus');
     if (el) el.textContent = text;
 }
-
 async function syncPush(silent = false) {
     const cfg = DB.gh;
     if (!cfg || !cfg.token) { if (!silent) toast('Сначала сохраните GitHub-токен', true); return; }
-
     try {
-        setSyncStatus('Синхронизация...', 'syncing');
+        setSyncStatus('Синхронизация...');
         const payload = collectAllData();
         const gistBody = {
             description: 'ServiceHub data',
             public: false,
-            files: {
-                [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) }
-            }
+            files: { [GIST_FILENAME]: { content: JSON.stringify(payload, null, 2) } }
         };
-
         let gist;
         if (cfg.gistId) {
             gist = await gistRequest('PATCH', `https://api.github.com/gists/${cfg.gistId}`, cfg.token, gistBody);
@@ -599,15 +987,13 @@ async function syncPush(silent = false) {
             DB.gh = { ...cfg, gistId: gist.id };
             document.getElementById('ghGistId').value = gist.id;
         }
-
         setSyncStatus('✅ Синхронизировано: ' + new Date().toLocaleTimeString('ru-RU'));
         if (!silent) toast('Данные загружены в облако');
     } catch (e) {
         setSyncStatus('❌ Ошибка: ' + e.message);
-        if (!silent) toast('Ошибка синхронизации: ' + e.message, true);
+        if (!silent) toast('Ошибка синхронизации', true);
     }
 }
-
 async function syncPull(silent = false) {
     const cfg = DB.gh;
     if (!cfg || !cfg.token || !cfg.gistId) {
@@ -615,37 +1001,28 @@ async function syncPull(silent = false) {
         return;
     }
     try {
-        setSyncStatus('Загрузка...', 'syncing');
+        setSyncStatus('Загрузка...');
         const gist = await gistRequest('GET', `https://api.github.com/gists/${cfg.gistId}`, cfg.token);
         const file = gist.files[GIST_FILENAME];
-        if (!file) throw new Error('Файл данных не найден в Gist');
-        const content = file.truncated
-            ? await (await fetch(file.raw_url)).text()
-            : file.content;
-        const data = JSON.parse(content);
-        applyAllData(data);
-
+        if (!file) throw new Error('Файл данных не найден');
+        const content = file.truncated ? await (await fetch(file.raw_url)).text() : file.content;
+        applyAllData(JSON.parse(content));
         setSyncStatus('✅ Загружено: ' + new Date().toLocaleTimeString('ru-RU'));
         if (!silent) toast('Данные загружены из облака');
-        renderHeader();
-        renderHome();
-        renderCatalog();
-        renderDashboard();
+        refreshAll();
     } catch (e) {
         setSyncStatus('❌ Ошибка: ' + e.message);
-        if (!silent) toast('Ошибка загрузки: ' + e.message, true);
+        if (!silent) toast('Ошибка загрузки', true);
     }
 }
-
 function saveGithubConfig() {
     const token = document.getElementById('ghToken').value.trim();
     const gistId = document.getElementById('ghGistId').value.trim();
     if (!token) { toast('Введите токен', true); return; }
     DB.gh = { token, gistId: gistId || '' };
-    toast('Настройки синхронизации сохранены');
-    setSyncStatus('Настройки сохранены. Нажмите «Проверить связь».');
+    toast('Настройки сохранены');
+    setSyncStatus('Настройки сохранены.');
 }
-
 function clearGithubConfig() {
     if (!confirm('Удалить сохранённые токен и Gist ID?')) return;
     DB.gh = null;
@@ -654,12 +1031,11 @@ function clearGithubConfig() {
     setSyncStatus('Настройки удалены.');
     toast('Настройки удалены');
 }
-
 async function testGithubConnection() {
     const token = document.getElementById('ghToken').value.trim();
     if (!token) { toast('Сначала введите токен', true); return; }
     try {
-        setSyncStatus('Проверка...', 'syncing');
+        setSyncStatus('Проверка...');
         const user = await gistRequest('GET', 'https://api.github.com/user', token);
         setSyncStatus(`✅ Подключено как ${user.login}`);
         toast('Связь с GitHub установлена');
@@ -668,10 +1044,6 @@ async function testGithubConnection() {
         toast('Ошибка подключения', true);
     }
 }
-
-/* =========================================================
-   ЭКСПОРТ / ИМПОРТ JSON
-   ========================================================= */
 function exportJSON() {
     const data = collectAllData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -683,22 +1055,17 @@ function exportJSON() {
     URL.revokeObjectURL(url);
     toast('Файл скачан');
 }
-
 function importJSON(ev) {
     const file = ev.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
         try {
-            const data = JSON.parse(e.target.result);
-            applyAllData(data);
+            applyAllData(JSON.parse(e.target.result));
             toast('Данные импортированы');
-            renderHeader();
-            renderHome();
-            renderCatalog();
-            renderDashboard();
+            refreshAll();
         } catch (err) {
-            toast('Ошибка чтения файла: ' + err.message, true);
+            toast('Ошибка чтения файла', true);
         }
     };
     reader.readAsText(file);
@@ -710,7 +1077,16 @@ function importJSON(ev) {
    ========================================================= */
 function showPage(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
+    const pageEl = document.getElementById('page-' + name);
+    if (pageEl) pageEl.classList.add('active');
+
+    // подсветка навигации
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    const navMap = { home: 'navHome', catalog: 'navCatalog', dashboard: 'navDashLink' };
+    if (navMap[name]) {
+        const el = document.getElementById(navMap[name]);
+        if (el) el.classList.add('active');
+    }
 
     if (name === 'home')      renderHome();
     if (name === 'catalog')   renderCatalog();
@@ -720,13 +1096,18 @@ function showPage(name) {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function loadGithubConfigToForm() {
     const cfg = DB.gh;
     if (cfg) {
         document.getElementById('ghToken').value  = cfg.token || '';
         document.getElementById('ghGistId').value = cfg.gistId || '';
     }
+}
+function refreshAll() {
+    renderHeader();
+    renderHome();
+    renderCatalog();
+    renderDashboard();
 }
 
 /* =========================================================
@@ -736,17 +1117,25 @@ function renderHeader() {
     const user = currentUser();
     const info = document.getElementById('userInfo');
     const navDash = document.getElementById('navDashboard');
+    const navSettings = document.getElementById('navSettings');
 
     if (user) {
         navDash.style.display = 'list-item';
-        const initials = user.name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+        navSettings.style.display = 'list-item';
+        const av = user.avatar
+            ? `<div class="avatar" style="background-image:url('${user.avatar}')" title="Личный кабинет"></div>`
+            : `<div class="avatar" title="Личный кабинет">${escapeHtml(initials(user.name))}</div>`;
+
         info.innerHTML = `
-            <div class="avatar">${escapeHtml(initials)}</div>
-            <span class="name">${escapeHtml(user.name)}</span>
+            <button class="user-menu-btn" onclick="showPage('dashboard')" title="Перейти в личный кабинет">
+                ${av}
+                <span class="name">${escapeHtml(user.name)}</span>
+            </button>
             <button class="btn btn-sm btn-outline" onclick="logout()">Выйти</button>
         `;
     } else {
         navDash.style.display = 'none';
+        navSettings.style.display = 'none';
         info.innerHTML = `
             <button class="btn btn-sm btn-outline" onclick="openAuth('login')">Войти</button>
             <button class="btn btn-sm" onclick="openAuth('register')">Регистрация</button>
@@ -758,18 +1147,8 @@ function renderHeader() {
    АВТОРИЗАЦИЯ
    ========================================================= */
 let authMode = 'login';
-
-function openAuth(mode) {
-    authMode = mode;
-    resetAuthForm();
-    showPage('auth');
-}
-
-function switchAuthMode() {
-    authMode = authMode === 'login' ? 'register' : 'login';
-    resetAuthForm();
-}
-
+function openAuth(mode) { authMode = mode; resetAuthForm(); showPage('auth'); }
+function switchAuthMode() { authMode = authMode === 'login' ? 'register' : 'login'; resetAuthForm(); }
 function resetAuthForm() {
     const isLogin = authMode === 'login';
     document.getElementById('authTitle').textContent    = isLogin ? 'Вход' : 'Регистрация';
@@ -780,31 +1159,30 @@ function resetAuthForm() {
     document.getElementById('authError').textContent = '';
     document.getElementById('authForm').reset();
 }
-
 function handleAuth(e) {
     e.preventDefault();
-    const nameEl = document.getElementById('authName');
     const email  = document.getElementById('authEmail').value.trim().toLowerCase();
     const pwd    = document.getElementById('authPassword').value;
     const errEl  = document.getElementById('authError');
     errEl.textContent = '';
 
     if (authMode === 'register') {
-        const name = nameEl.value.trim();
-        if (name.length < 2) { errEl.textContent = 'Введите имя (мин. 2 символа)'; return; }
-        if (DB.users.some(u => u.email === email)) {
-            errEl.textContent = 'Пользователь с таким email уже существует';
-            return;
-        }
+        const name = document.getElementById('authName').value.trim();
+        if (name.length < 2) { errEl.textContent = 'Введите имя'; return; }
+        if (DB.users.some(u => u.email === email)) { errEl.textContent = 'Email уже занят'; return; }
+
         const user = {
             id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
             name, email,
             password: hashPassword(pwd),
+            avatar: '',
+            bio: '',
+            phone: '',
             createdAt: new Date().toISOString()
         };
         const users = DB.users; users.push(user); DB.users = users;
         DB.session = { userId: user.id };
-        toast('Аккаунт создан! Добро пожаловать, ' + name);
+        toast('Аккаунт создан!');
         renderHeader();
         showPage('dashboard');
     } else {
@@ -818,11 +1196,8 @@ function handleAuth(e) {
         renderHeader();
         showPage('dashboard');
     }
-
-    // автосинк после авторизации
     if (DB.gh && DB.gh.token) syncPush(true);
 }
-
 function logout() {
     DB.session = null;
     renderHeader();
@@ -833,19 +1208,14 @@ function logout() {
 /* =========================================================
    КАРТИНКИ
    ========================================================= */
-const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024; // 1.5 МБ
-
+const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
 function handleImageUpload(ev) {
     const file = ev.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast('Это не изображение', true); return; }
-    if (file.size > MAX_IMAGE_BYTES) {
-        toast('Файл слишком большой (макс. 1.5 МБ)', true);
-        return;
-    }
+    if (file.size > MAX_IMAGE_BYTES) { toast('Файл слишком большой (макс. 1.5 МБ)', true); return; }
     const reader = new FileReader();
     reader.onload = e => {
-        // сжимаем через canvas, чтобы поместиться в gist/localStorage
         compressImage(e.target.result, 900, 0.82).then(dataUrl => {
             document.getElementById('serviceImageData').value = dataUrl;
             const preview = document.getElementById('imagePreview');
@@ -857,7 +1227,6 @@ function handleImageUpload(ev) {
     };
     reader.readAsDataURL(file);
 }
-
 function compressImage(dataUrl, maxW, quality) {
     return new Promise(resolve => {
         const img = new Image();
@@ -874,7 +1243,6 @@ function compressImage(dataUrl, maxW, quality) {
         img.src = dataUrl;
     });
 }
-
 function clearImage() {
     document.getElementById('serviceImageData').value = '';
     document.getElementById('serviceImageInput').value = '';
@@ -917,15 +1285,16 @@ function serviceCard(s, opts = {}) {
             </div>
         </div>`;
 }
-
 function renderHome() {
     const all = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
     const box = document.getElementById('homeServices');
     box.innerHTML = all.length
         ? all.map(s => serviceCard(s)).join('')
-        : `<div class="empty" style="grid-column:1/-1;">Пока нет услуг. Зарегистрируйтесь и добавьте первую!</div>`;
+        : `<div class="empty" style="grid-column:1/-1;">
+             <div class="empty-icon">📭</div>
+             Пока нет услуг. Зарегистрируйтесь и добавьте первую!
+           </div>`;
 }
-
 function renderCatalog() {
     const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
     let list = DB.services.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -941,29 +1310,252 @@ function renderCatalog() {
     if (!list.length) {
         box.innerHTML = '';
         empty.style.display = 'block';
-        empty.textContent = q ? 'Ничего не найдено по запросу «' + q + '»' : 'Услуг пока нет.';
+        empty.querySelector('.empty-icon').textContent = q ? '🔍' : '📭';
+        empty.childNodes[2].textContent = q ? 'Ничего не найдено' : 'Услуг пока нет.';
     } else {
         empty.style.display = 'none';
         box.innerHTML = list.map(s => serviceCard(s)).join('');
     }
 }
 
+/* =========================================================
+   ЛИЧНЫЙ КАБИНЕТ
+   ========================================================= */
 function renderDashboard() {
     const user = currentUser();
     if (!user) { showPage('auth'); return; }
-    const mine = DB.services
-        .filter(s => s.userId === user.id)
-        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+    // Профиль в сайдбаре
+    const dashAvatar = document.getElementById('dashAvatar');
+    if (user.avatar) {
+        dashAvatar.style.backgroundImage = `url('${user.avatar}')`;
+        dashAvatar.textContent = '';
+    } else {
+        dashAvatar.style.backgroundImage = '';
+        dashAvatar.textContent = initials(user.name);
+    }
+    document.getElementById('dashName').textContent  = user.name;
+    document.getElementById('dashEmail').textContent = user.email;
+
+    // Статистика
+    const mine = DB.services.filter(s => s.userId === user.id);
+    const totalPrice = mine.reduce((sum, s) => sum + Number(s.price || 0), 0);
+    const categories = new Set(mine.map(s => s.category)).size;
+    const withImages = mine.filter(s => s.image).length;
+
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card purple">
+            <div class="value">${mine.length}</div>
+            <div class="label">Всего услуг</div>
+        </div>
+        <div class="stat-card green">
+            <div class="value">${formatPrice(totalPrice)}</div>
+            <div class="label">Сумма прайсов</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="value">${categories}</div>
+            <div class="label">Категорий</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">${withImages}</div>
+            <div class="label">С фото</div>
+        </div>
+    `;
+
+    // Последние услуги (обзор)
+    const recent = mine.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+    const recentBox = document.getElementById('recentServices');
+    if (recent.length) {
+        recentBox.innerHTML = recent.map(s => `
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:0.8rem 1rem; background:#f7f9fc; border-radius:10px; margin-bottom:0.6rem;">
+                <div style="min-width:0; flex:1;">
+                    <div style="font-weight:600; color:var(--primary-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${escapeHtml(s.title)}
+                    </div>
+                    <div style="font-size:0.82rem; color:var(--muted);">
+                        ${escapeHtml(s.category)} • ${new Date(s.createdAt).toLocaleDateString('ru-RU')}
+                    </div>
+                </div>
+                <div style="font-weight:700; color:var(--primary); white-space:nowrap;">
+                    ${formatPrice(s.price)}
+                </div>
+            </div>
+        `).join('') + `
+            <button class="btn btn-ghost btn-sm" style="margin-top:0.5rem;" onclick="showDashTab('services')">
+                Все услуги →
+            </button>`;
+    } else {
+        recentBox.innerHTML = `
+            <div style="padding:1.5rem; text-align:center; color:var(--muted); background:#f7f9fc; border-radius:10px;">
+                Здесь появятся ваши последние услуги
+            </div>`;
+    }
+
+    // Мои услуги (вкладка)
     const box = document.getElementById('myServices');
-    const empty = document.getElementById('myServicesEmpty');
+    const emptyEl = document.getElementById('myServicesEmpty');
     if (!mine.length) {
         box.innerHTML = '';
-        empty.style.display = 'block';
+        emptyEl.style.display = 'block';
     } else {
-        empty.style.display = 'none';
-        box.innerHTML = mine.map(s => serviceCard(s, { mine: true })).join('');
+        emptyEl.style.display = 'none';
+        box.innerHTML = mine
+            .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map(s => serviceCard(s, { mine: true }))
+            .join('');
     }
+
+    // Профиль
+    renderProfileForm();
+}
+
+function showDashTab(name) {
+    if (!currentUser()) { showPage('auth'); return; }
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    const el = document.querySelector(`.dash-tab[data-tab="${name}"]`);
+    if (el) el.classList.add('active');
+
+    document.querySelectorAll('.dash-menu button').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector(`.dash-menu button[data-tab="${name}"]`);
+    if (btn) btn.classList.add('active');
+
+    if (name === 'overview' || name === 'services') renderDashboard();
+    if (name === 'profile') renderProfileForm();
+}
+
+function renderProfileForm() {
+    const user = currentUser();
+    if (!user) return;
+
+    document.getElementById('profileName').value  = user.name || '';
+    document.getElementById('profileEmail').value = user.email || '';
+    document.getElementById('profileBio').value   = user.bio || '';
+    document.getElementById('profilePhone').value = user.phone || '';
+
+    const bigAv = document.getElementById('profileAvatarBig');
+    if (user.avatar) {
+        bigAv.style.backgroundImage = `url('${user.avatar}')`;
+        bigAv.textContent = '';
+        bigAv.classList.add('has-image');
+    } else {
+        bigAv.style.backgroundImage = '';
+        bigAv.textContent = initials(user.name);
+        bigAv.classList.remove('has-image');
+    }
+    document.getElementById('profileSuccess').textContent = '';
+}
+
+function saveProfile(e) {
+    e.preventDefault();
+    const user = currentUser();
+    if (!user) return;
+
+    const name  = document.getElementById('profileName').value.trim();
+    const email = document.getElementById('profileEmail').value.trim().toLowerCase();
+    const bio   = document.getElementById('profileBio').value.trim();
+    const phone = document.getElementById('profilePhone').value.trim();
+    const successEl = document.getElementById('profileSuccess');
+    successEl.textContent = '';
+
+    if (name.length < 2) { successEl.style.color = 'var(--danger)'; successEl.textContent = 'Имя слишком короткое'; return; }
+    if (!/^\S+@\S+\.\S+$/.test(email)) { successEl.style.color = 'var(--danger)'; successEl.textContent = 'Некорректный email'; return; }
+    if (DB.users.some(u => u.email === email && u.id !== user.id)) {
+        successEl.style.color = 'var(--danger)';
+        successEl.textContent = 'Этот email уже используется';
+        return;
+    }
+
+    const users = DB.users;
+    const idx = users.findIndex(u => u.id === user.id);
+    users[idx] = { ...users[idx], name, email, bio, phone, updatedAt: new Date().toISOString() };
+    DB.users = users;
+
+    successEl.style.color = 'var(--success)';
+    successEl.textContent = '✅ Профиль сохранён';
+    toast('Профиль обновлён');
+
+    renderHeader();
+    renderDashboard();
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function handleAvatarUpload(ev) {
+    const file = ev.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('Это не изображение', true); return; }
+    if (file.size > MAX_IMAGE_BYTES) { toast('Файл слишком большой (макс. 1.5 МБ)', true); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+        compressImage(e.target.result, 400, 0.85).then(dataUrl => {
+            const user = currentUser();
+            const users = DB.users;
+            const idx = users.findIndex(u => u.id === user.id);
+            users[idx] = { ...users[idx], avatar: dataUrl };
+            DB.users = users;
+            renderHeader();
+            renderDashboard();
+            toast('Аватар обновлён');
+            if (DB.gh && DB.gh.token) syncPush(true);
+        });
+    };
+    reader.readAsDataURL(file);
+    ev.target.value = '';
+}
+
+function removeAvatar() {
+    const user = currentUser();
+    if (!user) return;
+    const users = DB.users;
+    const idx = users.findIndex(u => u.id === user.id);
+    users[idx] = { ...users[idx], avatar: '' };
+    DB.users = users;
+    renderHeader();
+    renderDashboard();
+    toast('Аватар удалён');
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function changePassword(e) {
+    e.preventDefault();
+    const user = currentUser();
+    if (!user) return;
+
+    const oldPwd = document.getElementById('oldPwd').value;
+    const newPwd = document.getElementById('newPwd').value;
+    const newPwd2 = document.getElementById('newPwd2').value;
+    const errEl = document.getElementById('pwdError');
+    const okEl  = document.getElementById('pwdSuccess');
+    errEl.textContent = ''; okEl.textContent = '';
+
+    if (hashPassword(oldPwd) !== user.password) { errEl.textContent = 'Неверный текущий пароль'; return; }
+    if (newPwd !== newPwd2) { errEl.textContent = 'Пароли не совпадают'; return; }
+    if (newPwd.length < 6) { errEl.textContent = 'Пароль слишком короткий'; return; }
+
+    const users = DB.users;
+    const idx = users.findIndex(u => u.id === user.id);
+    users[idx] = { ...users[idx], password: hashPassword(newPwd) };
+    DB.users = users;
+
+    okEl.textContent = '✅ Пароль изменён';
+    e.target.reset();
+    toast('Пароль изменён');
+    if (DB.gh && DB.gh.token) syncPush(true);
+}
+
+function deleteAccount() {
+    const user = currentUser();
+    if (!user) return;
+    if (!confirm('Удалить аккаунт и ВСЕ ваши услуги? Это необратимо.')) return;
+    if (!confirm('Точно удалить? Отменить будет невозможно.')) return;
+
+    DB.users = DB.users.filter(u => u.id !== user.id);
+    DB.services = DB.services.filter(s => s.userId !== user.id);
+    DB.session = null;
+
+    toast('Аккаунт удалён');
+    renderHeader();
+    showPage('home');
+    if (DB.gh && DB.gh.token) syncPush(true);
 }
 
 /* =========================================================
@@ -1001,14 +1593,11 @@ function openServiceModal(id = null) {
     } else {
         title.textContent = 'Новая услуга';
     }
-
     modal.classList.add('active');
 }
-
 function closeServiceModal() {
     document.getElementById('serviceModal').classList.remove('active');
 }
-
 function saveService(e) {
     e.preventDefault();
     const user = currentUser();
@@ -1043,13 +1632,9 @@ function saveService(e) {
     }
     DB.services = list;
     closeServiceModal();
-    renderDashboard();
-    renderHome();
-    renderCatalog();
-
+    refreshAll();
     if (DB.gh && DB.gh.token) syncPush(true);
 }
-
 function deleteService(id) {
     const user = currentUser();
     if (!user) return;
@@ -1057,15 +1642,12 @@ function deleteService(id) {
 
     DB.services = DB.services.filter(s => !(s.id === id && s.userId === user.id));
     toast('Услуга удалена');
-    renderDashboard();
-    renderHome();
-    renderCatalog();
-
+    refreshAll();
     if (DB.gh && DB.gh.token) syncPush(true);
 }
 
 /* =========================================================
-   МОДАЛКА: закрытие по клику вне и Esc
+   ЗАКРЫТИЕ МОДАЛКИ
    ========================================================= */
 document.getElementById('serviceModal').addEventListener('click', e => {
     if (e.target.id === 'serviceModal') closeServiceModal();
@@ -1078,13 +1660,13 @@ document.addEventListener('keydown', e => {
    ИНИЦИАЛИЗАЦИЯ
    ========================================================= */
 (function init() {
-    // демо-данные
     if (!localStorage.getItem('sh_seeded')) {
         const demoUser = {
             id: 'u_demo',
             name: 'Демо Пользователь',
             email: 'demo@example.com',
             password: hashPassword('demo123'),
+            avatar: '', bio: 'Профессиональный разработчик и дизайнер.', phone: '',
             createdAt: new Date().toISOString()
         };
         if (!DB.users.some(u => u.email === demoUser.email)) {
@@ -1114,10 +1696,7 @@ document.addEventListener('keydown', e => {
     renderHeader();
     renderHome();
 
-    // если есть настройки GH — подтягиваем из облака при загрузке
-    if (DB.gh && DB.gh.token && DB.gh.gistId) {
-        syncPull(true);
-    }
+    if (DB.gh && DB.gh.token && DB.gh.gistId) syncPull(true);
 })();
 </script>
 </body>
